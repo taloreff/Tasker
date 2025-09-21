@@ -1,0 +1,39 @@
+# .cursor
+project_name: Tasker
+language: typescript
+package_manager: pnpm
+
+backend:
+  framework: nestjs
+  orm: typeorm
+  database: postgres
+  style: modular, service-repository pattern, dto validation with class-validator
+  auth: jwt
+  cron: nestjs-schedule
+  containerization: docker-compose with postgres + nestjs service
+  testing: jest for unit/integration tests
+
+frontend:
+  framework: nextjs
+  ui: react, tailwind, shadcn
+  drag_drop: dnd-kit
+  charts: recharts
+  style: functional components with hooks
+  data_fetching: react-query (useQuery/useMutation) for client side
+  state: minimal local state + server-side fetch where possible
+  containerization: dockerfile for frontend build
+  testing: vitest + react-testing-library
+
+deployment:
+  strategy: free-tier hosting (railway/vercel/render)
+  notes: prepare Docker setup for backend and vercel-compatible frontend build
+
+general_guidelines:
+  - Always generate strongly typed code with TypeScript.
+  - Use clean architecture: controllers → services → repositories in NestJS.
+  - Use DTOs for all API requests/responses.
+  - Use Tailwind utility classes, but wrap in ShadCN components when available.
+  - Favor reusable React components (TaskCard, Column, Board).
+  - API contract: JSON, REST.
+  - Provide seed data and migrations for Postgres via TypeORM CLI.
+  - Use environment variables for config (dotenv).
