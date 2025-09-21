@@ -1,4 +1,4 @@
-import dataSource from '../../../ormconfig';
+import dataSource from '../../ormconfig';
 import { User } from '../../user/entities/user.entity';
 import { Role } from '../../user/entities/role.entity';
 import { userFactory } from '../factories/user.factory';

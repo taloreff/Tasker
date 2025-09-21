@@ -7,8 +7,9 @@
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm --dir apps/backend start:dev"
-      }
+        "command": "cd apps/backend && node --experimental-global-webcrypto dist/main.js"
+      },
+      "dependsOn": ["build"]
     },
     "build": {
       "executor": "nx:run-commands",

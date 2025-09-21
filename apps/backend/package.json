@@ -4,7 +4,7 @@
   "description": "nestjs application",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "nest build",
+    "build": "tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -39,6 +39,7 @@
     "@types/node": "^12.7.5",
     "@types/supertest": "^2.0.8",
     "jest": "^24.9.0",
+    "nodemon": "^3.1.10",
     "nx": "^21.5.3",
     "prettier": "^1.18.2",
     "supertest": "^4.0.2",

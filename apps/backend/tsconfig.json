@@ -1,12 +1,28 @@
 {
-  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-  "module": "nodenext",
-  "moduleResolution": "nodenext",
+  "target": "es2020",
+  "lib": ["es2020"],
+  "module": "commonjs",
+  "moduleResolution": "node",
   "esModuleInterop": true,
+  "allowSyntheticDefaultImports": true,
   "experimentalDecorators": true,
   "emitDecoratorMetadata": true,
-  "useDefineForClassFields": false
+  "useDefineForClassFields": false,
+  "outDir": "./dist",
+  "rootDir": "./src",
+  "declaration": false,
+  "removeComments": true,
+  "strict": true,
+  "noImplicitAny": false,
+  "strictNullChecks": false,
+  "strictFunctionTypes": false,
+  "noImplicitReturns": false,
+  "noImplicitThis": false,
+  "noUnusedLocals": false,
+  "noUnusedParameters": false,
+  "skipLibCheck": true,
+  "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "test/**/*.ts"]

@@ -66,6 +66,9 @@ importers:
       jest:
         specifier: ^24.9.0
         version: 24.9.0
+      nodemon:
+        specifier: ^3.1.10
+        version: 3.1.10
       nx:
         specifier: ^21.5.3
         version: 21.5.3
@@ -1921,6 +1924,9 @@ packages:
   iferr@0.1.5:
     resolution: {integrity: sha512-DUNFN5j7Tln0D+TxzloUjKB+CtVu6myn0JEFak6dG18mNt9YkQ6lzGCdafwofISZ1lLF3xRHJ98VKy9ynkcFaA==}
 
+  ignore-by-default@1.0.1:
+    resolution: {integrity: sha512-Ius2VYcGNk7T90CppJqcIkS5ooHUZyIQK+ClZfMfMNFEF9VSE73Fq+906u/CWu92x4gzZMWOwfFYckPObzdEbA==}
+
   ignore@5.3.2:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
@@ -2677,6 +2683,11 @@ packages:
   node-releases@2.0.21:
     resolution: {integrity: sha512-5b0pgg78U3hwXkCM8Z9b2FJdPZlr9Psr9V2gQPESdGHqbntyFJKFW4r5TeWGFzafGY3hzs1JC62VEQMbl1JFkw==}
 
+  nodemon@3.1.10:
+    resolution: {integrity: sha512-WDjw3pJ0/0jMFmyNDp3gvY2YizjLmmOUQo6DEBY+JgdvW/yQ9mEeSw6H5ythl5Ny2ytb7f9C2nIbjSxMNzbJXw==}
+    engines: {node: '>=10'}
+    hasBin: true
+
   noms@0.0.0:
     resolution: {integrity: sha512-lNDU9VJaOPxUmXcLb+HQFeUgQQPtMI24Gt6hgfuMHRJgMRHMF/qZ4HJD3GDru4sSw9IQl2jPjAYnQrdIeLbwow==}
 
@@ -3023,6 +3034,9 @@ packages:
 
   psl@1.15.0:
     resolution: {integrity: sha512-JZd3gMVBAVQkSs6HdNZo9Sdo0LNcQeMNP3CozBJb3JYC/QUYZTnKxP+f8oWRX4rHP5EurWxqAHTSwUCjlNKa1w==}
+
+  pstree.remy@1.1.8:
+    resolution: {integrity: sha512-77DZwxQmxKnu3aR542U+X8FypNzbfJ+C5XQDk3uWjWxn6151aIMGthWYRXTqT1E5oJvg+ljaa2OJi+VfvCOQ8w==}
 
   public-encrypt@4.0.3:
     resolution: {integrity: sha512-zVpa8oKZSz5bTMTFClc1fQOnyyEzpl5ozpi1B5YcvBrdohMjH2rfsBtyXcuNuwjsDIXmBYlF2N5FlJYhR29t8Q==}
@@ -3372,6 +3386,10 @@ packages:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
 
+  simple-update-notifier@2.0.0:
+    resolution: {integrity: sha512-a2B9Y0KlNXl9u/vsW6sTIu9vGEpfKu2wRV6l1H3XEas/0gUIzGzBoP/IouTcUQbm9JWZLH3COxyn03TYlFax6w==}
+    engines: {node: '>=10'}
+
   sisteransi@1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
 
@@ -3688,6 +3706,10 @@ packages:
     resolution: {integrity: sha512-kh9LVIWH5CnL63Ipf0jhlBIy0UsrMj/NJDfpsy1SqOXlLKEVyXXYrnFxFT1yOOYVGBSApeVnjPw/sBz5BfEjAQ==}
     engines: {node: '>=14.16'}
 
+  touch@3.1.1:
+    resolution: {integrity: sha512-r0eojU4bI8MnHr8c5bNo7lJDdI2qXlWWJk6a9EAFG7vbhTjElYhBVS3/miuE0uOuoLdb8Mc/rVfsmm6eo5o9GA==}
+    hasBin: true
+
   tough-cookie@2.5.0:
     resolution: {integrity: sha512-nlLsUzgm1kfLXSXfRZMc1KLAugd4hqJHDTvc2hDIwS3mZAfMEuMbc03SujMF+GEcpaX/qboeycw6iO8JwVv2+g==}
     engines: {node: '>=0.8'}
@@ -3875,6 +3897,9 @@ packages:
   unbox-primitive@1.1.0:
     resolution: {integrity: sha512-nWJ91DjeOkej/TA8pXQ3myruKpKEYgqvpw9lz4OPHj/NWFNluYrjbz9j01CJ8yKQd2g4jFoOkINCTW2I5LEEyw==}
     engines: {node: '>= 0.4'}
+
+  undefsafe@2.0.5:
+    resolution: {integrity: sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==}
 
   union-value@1.0.1:
     resolution: {integrity: sha512-tJfXmxMeWYnczCVs7XAEvIV7ieppALdyepWMkHkwciRpZraG/xwT+s2JN8+pr1+8jCRf80FFzvr+MpQeeoF4Xg==}
@@ -4175,7 +4200,7 @@ snapshots:
       '@babel/types': 7.28.4
       '@jridgewell/remapping': 2.3.5
       convert-source-map: 2.0.0
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@5.5.0)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -4252,7 +4277,7 @@ snapshots:
       '@babel/parser': 7.28.4
       '@babel/template': 7.27.2
       '@babel/types': 7.28.4
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -4376,9 +4401,7 @@ snapshots:
       source-map: 0.6.1
       string-length: 2.0.0
     transitivePeerDependencies:
-      - bufferutil
       - supports-color
-      - utf-8-validate
 
   '@jest/schemas@30.0.5':
     dependencies:
@@ -4621,7 +4644,7 @@ snapshots:
 
   '@tokenizer/inflate@0.2.7':
     dependencies:
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@5.5.0)
       fflate: 0.8.2
       token-types: 6.1.1
     transitivePeerDependencies:
@@ -5121,8 +5144,7 @@ snapshots:
 
   binary-extensions@1.13.1: {}
 
-  binary-extensions@2.3.0:
-    optional: true
+  binary-extensions@2.3.0: {}
 
   bindings@1.5.0:
     dependencies:
@@ -5145,7 +5167,7 @@ snapshots:
     dependencies:
       bytes: 3.1.2
       content-type: 1.0.5
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@5.5.0)
       http-errors: 2.0.0
       iconv-lite: 0.6.3
       on-finished: 2.4.1
@@ -5418,7 +5440,6 @@ snapshots:
       readdirp: 3.6.0
     optionalDependencies:
       fsevents: 2.3.3
-    optional: true
 
   chownr@1.1.4: {}
 
@@ -5678,9 +5699,11 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
-  debug@4.4.3:
+  debug@4.4.3(supports-color@5.5.0):
     dependencies:
       ms: 2.1.3
+    optionalDependencies:
+      supports-color: 5.5.0
 
   decamelize@1.2.0: {}
 
@@ -5996,7 +6019,7 @@ snapshots:
       content-type: 1.0.5
       cookie: 0.7.2
       cookie-signature: 1.2.2
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@5.5.0)
       encodeurl: 2.0.0
       escape-html: 1.0.3
       etag: 1.8.1
@@ -6105,7 +6128,7 @@ snapshots:
 
   finalhandler@2.1.0:
     dependencies:
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@5.5.0)
       encodeurl: 2.0.0
       escape-html: 1.0.3
       on-finished: 2.4.1
@@ -6287,7 +6310,6 @@ snapshots:
   glob-parent@5.1.2:
     dependencies:
       is-glob: 4.0.3
-    optional: true
 
   glob@10.4.5:
     dependencies:
@@ -6432,6 +6454,8 @@ snapshots:
 
   iferr@0.1.5: {}
 
+  ignore-by-default@1.0.1: {}
+
   ignore@5.3.2: {}
 
   import-local@2.0.0:
@@ -6527,7 +6551,6 @@ snapshots:
   is-binary-path@2.1.0:
     dependencies:
       binary-extensions: 2.3.0
-    optional: true
 
   is-boolean-object@1.2.2:
     dependencies:
@@ -6720,7 +6743,7 @@ snapshots:
 
   istanbul-lib-source-maps@3.0.6:
     dependencies:
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@5.5.0)
       istanbul-lib-coverage: 2.0.5
       make-dir: 2.1.0
       rimraf: 2.7.1
@@ -7448,6 +7471,19 @@ snapshots:
 
   node-releases@2.0.21: {}
 
+  nodemon@3.1.10:
+    dependencies:
+      chokidar: 3.6.0
+      debug: 4.4.3(supports-color@5.5.0)
+      ignore-by-default: 1.0.1
+      minimatch: 3.1.2
+      pstree.remy: 1.1.8
+      semver: 7.7.2
+      simple-update-notifier: 2.0.0
+      supports-color: 5.5.0
+      touch: 3.1.1
+      undefsafe: 2.0.5
+
   noms@0.0.0:
     dependencies:
       inherits: 2.0.4
@@ -7828,6 +7864,8 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
+  pstree.remy@1.1.8: {}
+
   public-encrypt@4.0.3:
     dependencies:
       bn.js: 4.12.2
@@ -7932,7 +7970,6 @@ snapshots:
   readdirp@3.6.0:
     dependencies:
       picomatch: 2.3.1
-    optional: true
 
   realpath-native@1.1.0:
     dependencies:
@@ -8064,7 +8101,7 @@ snapshots:
 
   router@2.2.0:
     dependencies:
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@5.5.0)
       depd: 2.0.0
       is-promise: 4.0.0
       parseurl: 1.3.3
@@ -8151,7 +8188,7 @@ snapshots:
 
   send@1.2.0:
     dependencies:
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@5.5.0)
       encodeurl: 2.0.0
       escape-html: 1.0.3
       etag: 1.8.1
@@ -8264,6 +8301,10 @@ snapshots:
   signal-exit@3.0.7: {}
 
   signal-exit@4.1.0: {}
+
+  simple-update-notifier@2.0.0:
+    dependencies:
+      semver: 7.7.2
 
   sisteransi@1.0.5: {}
 
@@ -8626,6 +8667,8 @@ snapshots:
       '@tokenizer/token': 0.3.0
       ieee754: 1.2.1
 
+  touch@3.1.1: {}
+
   tough-cookie@2.5.0:
     dependencies:
       psl: 1.15.0
@@ -8790,7 +8833,7 @@ snapshots:
       app-root-path: 3.1.0
       buffer: 6.0.3
       dayjs: 1.11.18
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@5.5.0)
       dedent: 1.7.0
       dotenv: 16.6.1
       glob: 10.4.5
@@ -8823,6 +8866,8 @@ snapshots:
       has-bigints: 1.1.0
       has-symbols: 1.1.0
       which-boxed-primitive: 1.1.1
+
+  undefsafe@2.0.5: {}
 
   union-value@1.0.1:
     dependencies:
