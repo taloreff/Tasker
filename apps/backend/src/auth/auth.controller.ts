@@ -6,7 +6,6 @@ import { AuthGuard } from '@nestjs/passport';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // Local login → validate credentials, then return JWT
   @UseGuards(AuthGuard('local'))
   @Post('login')
   async login(@Request() req) {

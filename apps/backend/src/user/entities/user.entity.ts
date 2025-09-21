@@ -12,6 +12,7 @@ import {
   JoinTable,
   ManyToMany,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 import { Role } from './role.entity';
 
 @Entity({ name: 'users' })
@@ -28,6 +29,7 @@ export class User {
   email: string;
 
   @Column({ name: 'password_hash', select: false })
+  @Exclude()
   passwordHash: string;
 
   @CreateDateColumn({ name: 'created_at' })

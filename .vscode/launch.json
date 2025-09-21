@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Backend",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/backend/src/main.ts",
+      "cwd": "${workspaceFolder}/apps/backend",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "console": "integratedTerminal",
+      "restart": true,
+      "protocol": "inspector",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "name": "Debug Backend (Nest CLI)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/nest",
+      "args": ["start", "--debug", "--watch"],
+      "cwd": "${workspaceFolder}/apps/backend",
+      "console": "integratedTerminal",
+      "restart": true,
+      "protocol": "inspector",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}
