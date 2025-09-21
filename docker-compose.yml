@@ -11,23 +11,5 @@ services:
       - '5432:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
-  backend:
-    build: ./backend
-    command: pnpm run start:dev
-    volumes:
-      - ./backend:/app
-    ports:
-      - '3000:3000'
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=tasker
-      - JWT_SECRET=dev_secret
-      - JWT_EXPIRES_IN=1d
-      - PORT=3000
-    depends_on:
-      - db
 volumes:
   pgdata:
