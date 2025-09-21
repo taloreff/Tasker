@@ -32,7 +32,10 @@ export class UserService {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.userRepo.findOne({ where: { email } });
+    return this.userRepo.findOne({ 
+      where: { email },
+      select: ['id', 'email', 'name', 'passwordHash', 'createdAt', 'updatedAt', 'roles']
+    });
   }  
 
   async update(id: string, dto: UpdateUserDto) {

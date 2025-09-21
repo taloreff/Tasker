@@ -7,9 +7,9 @@
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cd apps/backend && node --experimental-global-webcrypto dist/main.js"
-      },
-      "dependsOn": ["build"]
+        "command": "cd apps/backend && npx nodemon",
+        "color": true
+      }
     },
     "build": {
       "executor": "nx:run-commands",
