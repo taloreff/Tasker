@@ -6,15 +6,13 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
-  OneToMany,
   JoinColumn,
   Index,
 } from 'typeorm';
-import { Project } from '../../project/entities/project.entity';
-import { Column } from '../../column/entities/column.entity';
+import { Board } from '../../board/entities/board.entity';
 
-@Entity({ name: 'boards' })
-export class Board {
+@Entity({ name: 'columns' })
+export class Column {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -22,15 +20,15 @@ export class Board {
   @Index()
   name: string;
 
-  @TypeOrmColumn({ type: 'text', nullable: true })
-  description?: string;
-
-  @TypeOrmColumn({ name: 'project_id' })
+  @TypeOrmColumn({ name: 'board_id' })
   @Index()
-  projectId: string;
+  boardId: string;
 
   @TypeOrmColumn({ type: 'int', default: 0 })
   position: number;
+
+  @TypeOrmColumn({ length: 7, nullable: true })
+  color?: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
@@ -41,10 +39,8 @@ export class Board {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt?: Date;
 
-  @ManyToOne(() => Project, (project) => project.boards, { eager: false })
-  @JoinColumn({ name: 'project_id' })
-  project: Project;
+  @ManyToOne(() => Board, { eager: false })
+  @JoinColumn({ name: 'board_id' })
+  board: Board;
 
-  @OneToMany(() => Column, (column) => column.board)
-  columns: Column[];
 }
