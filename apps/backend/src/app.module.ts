@@ -8,6 +8,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { TeamModule } from './team/team.module';
 import { ProjectModule } from './project/project.module';
 import { BoardModule } from './board/board.module';
+import { ColumnModule } from './column/column.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { BoardModule } from './board/board.module';
     TeamModule,
     ProjectModule,
     BoardModule,
+    ColumnModule,
   ] 
 })
 export class AppModule {}
