@@ -12,6 +12,7 @@ import { ColumnModule } from './column/column.module';
 import { TaskModule } from './task/task.module';
 import { SubtaskModule } from './subtask/subtask.module';
 import { LabelModule } from './label/label.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { LabelModule } from './label/label.module';
     TaskModule,
     SubtaskModule,
     LabelModule,
+    CommentModule
   ] 
 })
 export class AppModule {}
