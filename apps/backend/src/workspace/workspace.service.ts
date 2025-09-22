@@ -28,7 +28,7 @@ export class WorkspaceService {
     return savedWorkspace;
   }
 
-  async findAllByUser(userId: string): Promise<Workspace[]> {
+  async findUserWorkspaces(userId: string): Promise<Workspace[]> {
     this.logger.log(`Finding workspaces for user: ${userId}`);
     
     // For now, return workspaces owned by user

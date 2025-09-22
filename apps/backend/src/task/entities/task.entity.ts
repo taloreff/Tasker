@@ -10,10 +10,13 @@ import {
   JoinColumn,
   JoinTable,
   Index,
+  OneToMany
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Board } from '../../board/entities/board.entity';
 import { Column } from '../../column/entities/column.entity';
+import { Subtask } from '../../subtask/entities/subtask.entity';
+import { Label } from '../../label/entities/label.entity';
 
 export enum TaskStatus {
   TODO = 'TODO',
@@ -21,14 +24,14 @@ export enum TaskStatus {
   REVIEW = 'REVIEW',
   DONE = 'DONE',
   BLOCKED = 'BLOCKED',
-  CANCELLED = 'CANCELLED',
+  CANCELLED = 'CANCELLED'
 }
 
 export enum TaskPriority {
   LOW = 'LOW',
   MEDIUM = 'MEDIUM',
   HIGH = 'HIGH',
-  URGENT = 'URGENT',
+  URGENT = 'URGENT'
 }
 
 @Entity({ name: 'tasks' })
@@ -46,14 +49,14 @@ export class Task {
   @TypeOrmColumn({
     type: 'enum',
     enum: TaskStatus,
-    default: TaskStatus.TODO,
+    default: TaskStatus.TODO
   })
   status: TaskStatus;
 
   @TypeOrmColumn({
     type: 'enum',
     enum: TaskPriority,
-    default: TaskPriority.MEDIUM,
+    default: TaskPriority.MEDIUM
   })
   priority: TaskPriority;
 
@@ -75,10 +78,22 @@ export class Task {
   @TypeOrmColumn({ type: 'int', default: 0 })
   position: number;
 
-  @TypeOrmColumn({ name: 'estimated_hours', type: 'decimal', precision: 5, scale: 2, nullable: true })
+  @TypeOrmColumn({
+    name: 'estimated_hours',
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    nullable: true
+  })
   estimatedHours?: number;
 
-  @TypeOrmColumn({ name: 'actual_hours', type: 'decimal', precision: 5, scale: 2, nullable: true })
+  @TypeOrmColumn({
+    name: 'actual_hours',
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    nullable: true
+  })
   actualHours?: number;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -102,11 +117,28 @@ export class Task {
   @JoinColumn({ name: 'board_id' })
   board: Board;
 
+  @OneToMany(
+    () => Subtask,
+    subtask => subtask.task
+  )
+  subtasks: Subtask[];
+
   @ManyToMany(() => User)
   @JoinTable({
     name: 'task_assignees',
     joinColumn: { name: 'task_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' }
   })
   assignees: User[];
+
+  @ManyToMany(
+    () => Label,
+    label => label.tasks
+  )
+  @JoinTable({
+    name: 'task_labels',
+    joinColumn: { name: 'task_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'label_id', referencedColumnName: 'id' }
+  })
+  labels: Label[];
 }

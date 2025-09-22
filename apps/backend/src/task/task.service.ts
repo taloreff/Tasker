@@ -2,7 +2,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-  BadRequestException,
+  BadRequestException
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -14,6 +14,7 @@ import { AssignTaskDto } from './dtos/assign-task.dto';
 import { BoardService } from '../board/board.service';
 import { ColumnService } from '../column/column.service';
 import { UserService } from '../user/user.service';
+import { Label } from '../label/entities/label.entity';
 
 @Injectable()
 export class TaskService {
@@ -88,7 +89,7 @@ export class TaskService {
 
     const tasks = await this.taskRepo.find({
       where: { boardId },
-      relations: ['createdBy', 'column', 'board', 'assignees'],
+      relations: ['createdBy', 'column', 'board', 'assignees', 'labels'],
       order: { columnId: 'ASC', position: 'ASC' }
     });
 
@@ -103,7 +104,7 @@ export class TaskService {
 
     const tasks = await this.taskRepo.find({
       where: { columnId },
-      relations: ['createdBy', 'column', 'board', 'assignees'],
+      relations: ['createdBy', 'column', 'board', 'assignees', 'labels'],
       order: { position: 'ASC' }
     });
 
@@ -116,7 +117,7 @@ export class TaskService {
 
     const task = await this.taskRepo.findOne({
       where: { id },
-      relations: ['createdBy', 'column', 'board', 'assignees']
+      relations: ['createdBy', 'column', 'board', 'assignees', 'labels']
     });
 
     if (!task) {
@@ -274,6 +275,7 @@ export class TaskService {
       .leftJoinAndSelect('task.column', 'column')
       .leftJoinAndSelect('task.board', 'board')
       .leftJoinAndSelect('task.assignees', 'assignees')
+      .leftJoinAndSelect('task.labels', 'labels')
       .where('(task.createdById = :userId OR assignees.id = :userId)', {
         userId
       });
@@ -299,4 +301,32 @@ export class TaskService {
     this.logger.log(`Found ${tasks.length} tasks for user: ${userId}`);
     return tasks;
   }
+
+  // Replace the updateTaskLabels method with this corrected version:
+
+async updateTaskLabels(
+  taskId: string,
+  labelIds: string[],
+  userId: string
+): Promise<Task> {
+  this.logger.log(`Updating labels for task: ${taskId} by user: ${userId}`);
+
+  await this.findOne(taskId, userId);
+
+  const taskWithLabels = await this.taskRepo.findOne({
+    where: { id: taskId },
+    relations: ['labels']
+  });
+
+  if (!taskWithLabels) {
+    throw new NotFoundException(`Task ${taskId} not found`);
+  }
+
+  taskWithLabels.labels = labelIds.map(id => ({ id } as Label));
+
+  await this.taskRepo.save(taskWithLabels);
+
+  this.logger.log(`Task labels updated: ${taskId}`);
+  return this.findOne(taskId, userId);
+}
 }
