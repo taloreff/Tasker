@@ -9,6 +9,9 @@ import { TeamModule } from './team/team.module';
 import { ProjectModule } from './project/project.module';
 import { BoardModule } from './board/board.module';
 import { ColumnModule } from './column/column.module';
+import { TaskModule } from './task/task.module';
+import { SubtaskModule } from './subtask/subtask.module';
+import { LabelModule } from './label/label.module';
 
 @Module({
   imports: [
@@ -28,6 +31,9 @@ import { ColumnModule } from './column/column.module';
     ProjectModule,
     BoardModule,
     ColumnModule,
+    TaskModule,
+    SubtaskModule,
+    LabelModule,
   ] 
 })
 export class AppModule {}

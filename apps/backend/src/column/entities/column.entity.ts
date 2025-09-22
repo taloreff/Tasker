@@ -6,10 +6,12 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
   Index,
 } from 'typeorm';
 import { Board } from '../../board/entities/board.entity';
+import { Task } from '../../task/entities/task.entity';
 
 @Entity({ name: 'columns' })
 export class Column {
@@ -43,4 +45,6 @@ export class Column {
   @JoinColumn({ name: 'board_id' })
   board: Board;
 
+  @OneToMany(() => Task, (task) => task.column)
+  tasks: Task[];
 }
