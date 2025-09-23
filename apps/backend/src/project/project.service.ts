@@ -313,7 +313,7 @@ export class ProjectService {
     } else {
       // Get all workspaces user has access to and their projects
       try {
-        const userWorkspaces = await this.workspaceService.findAllByUser(
+        const userWorkspaces = await this.workspaceService.findUserWorkspaces(
           userId
         );
         for (const workspace of userWorkspaces) {

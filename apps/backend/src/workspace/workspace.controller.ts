@@ -26,7 +26,7 @@ export class WorkspaceController {
 
   @Get()
   findAll(@Request() req) {
-    return this.workspaceService.findAllByUser(req.user.id);
+    return this.workspaceService.findUserWorkspaces(req.user.id);
   }
 
   @Get(':id')
