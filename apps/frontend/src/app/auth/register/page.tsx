@@ -259,7 +259,7 @@ export default function RegisterPage() {
                   ) : (
                     <>
                       Create account
-                      <CheckCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      <CheckCircle className="w-5 h-5x transition-transform" />
                     </>
                   )}
                 </Button>

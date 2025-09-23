@@ -23,7 +23,8 @@ export class UserService {
     }
   
     const user = this.userRepo.create({
-      name: dto.name,
+      firstName: dto.firstName,
+      lastName: dto.lastName,
       email: dto.email,
       passwordHash: dto.password,
     });
@@ -53,7 +54,7 @@ export class UserService {
     this.logger.log(`Finding user by email: ${email}`);
     const user = await this.userRepo.findOne({ 
       where: { email },
-      select: ['id', 'email', 'name', 'passwordHash', 'createdAt', 'updatedAt', 'roles']
+      select: ['id', 'email', 'firstName', 'lastName', 'passwordHash', 'createdAt', 'updatedAt', 'roles']
     });
     if (user) {
       this.logger.log(`User found by email: ${email} (ID: ${user.id})`);

@@ -20,9 +20,11 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 100 })
-  @Index()
-  name: string;
+  @Column({ length: 50, name: 'first_name' })
+  firstName: string;
+
+  @Column({ length: 50, name: 'last_name' })
+  lastName: string;
 
   @Column({ unique: true })
   @Index({ unique: true })

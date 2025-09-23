@@ -21,7 +21,8 @@ async function run() {
   // --- Seed users ---
   // Admin (only 1)
   const admin = await userFactory({
-    name: 'Admin',
+    firstName: 'Admin',
+    lastName: 'User',
     email: 'admin@tasker.com',
     passwordHash: 'admin123',
   });
@@ -30,7 +31,8 @@ async function run() {
 
   // Test user
   const testUser = await userFactory({
-    name: 'Test User',
+    firstName: 'Test',
+    lastName: 'User',
     email: 'user@tasker.com',
     passwordHash: 'user123',
   });

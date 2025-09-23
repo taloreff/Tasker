@@ -7,6 +7,7 @@
     "test": "nx test",
     "graph": "nx graph",
     "server:start": "pnpm nx serve backend",
+    "client:start": "pnpm nx serve frontend",
     "seed:users": "ts-node apps/backend/src/db/seed/user.seed.ts"
   },
   "devDependencies": {
