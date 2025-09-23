@@ -1,18 +1,17 @@
 {
-    "compileOnSave": false,
-    "compilerOptions": {
-      "rootDir": ".",
-      "baseUrl": ".",
-      "paths": {
-        "@tasker/backend/*": ["apps/backend/src/*"],
-        "@tasker/frontend/*": ["apps/frontend/src/*"],
-        "@tasker/types": ["libs/types/src/index.ts"],
-        "@tasker/utils": ["libs/utils/src/index.ts"],
-        "@tasker/hooks": ["libs/hooks/src/index.ts"],
-        "@tasker/ui": ["libs/ui/src/index.ts"]
-      },
-      "skipLibCheck": true
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@tasker/backend/*": ["apps/backend/src/*"],
+      "@tasker/frontend/*": ["apps/frontend/src/*"],
+      "@tasker/hooks": ["libs/hooks/src/index.ts"],
+      "@tasker/types": ["libs/types/src/index.ts"],
+      "@tasker/ui": ["libs/ui/src/index.ts"],
+      "@tasker/utils": ["libs/utils/src/index.ts"]
     },
-    "exclude": ["node_modules", "tmp"]
-  }
-  
+    "skipLibCheck": true
+  },
+  "exclude": ["node_modules", "tmp"]
+}
