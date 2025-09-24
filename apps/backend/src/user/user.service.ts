@@ -18,7 +18,7 @@ export class UserService {
     this.logger.log(`Creating user with email: ${dto.email}`);
     const existing = await this.userRepo.findOne({ where: { email: dto.email } });
     if (existing) {
-      this.logger.warn(`Email already in use: ${dto.email}`);
+      this.logger.error(`Email already in use: ${dto.email}`);
       throw new BadRequestException('Email already in use');
     }
   
@@ -43,7 +43,7 @@ export class UserService {
     this.logger.log(`Finding user by ID: ${id}`);
     const user = await this.userRepo.findOne({ where: { id }, relations:['roles'] });
     if (!user) {
-      this.logger.warn(`User not found: ${id}`);
+      this.logger.error(`User not found: ${id}`);
       throw new NotFoundException(`User ${id} not found`);
     }
     this.logger.log(`User found: ${user.email} (ID: ${user.id})`);

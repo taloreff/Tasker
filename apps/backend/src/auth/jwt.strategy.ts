@@ -19,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user = await this.userService.findOne(payload.sub);
     
     if (!user) {
-      this.logger.warn(`User not found for JWT payload: ${payload.sub}`);
+      this.logger.error(`User not found for JWT payload: ${payload.sub}`);
       return null;
     }
     

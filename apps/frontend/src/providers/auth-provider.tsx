@@ -4,7 +4,11 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Cookies from 'js-cookie';
 import { AuthService } from '@/services/auth';
-import { AuthContextType, LoginCredentials, RegisterCredentials } from '@/types/auth';
+import {
+  AuthContextType,
+  LoginCredentials,
+  RegisterCredentials,
+} from '@/types/auth';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -24,7 +28,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [token, setToken] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  // Initialize token from cookies
   useEffect(() => {
     const storedToken = Cookies.get('access_token');
     if (storedToken) {
@@ -32,44 +35,55 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, []);
 
-  // Fetch user profile when token exists
-  const { data: user, isLoading: isUserLoading } = useQuery({
+  const {
+    data: user,
+    isLoading: isUserLoading,
+    error,
+  } = useQuery({
     queryKey: ['user', 'profile'],
     queryFn: AuthService.getProfile,
     enabled: !!token,
     retry: false,
   });
 
-  // Login mutation
+  useEffect(() => {
+    if (error && token) {
+      console.log('User profile fetch failed, clearing token');
+      Cookies.remove('access_token');
+      setToken(null);
+      queryClient.removeQueries({ queryKey: ['user', 'profile'] });
+    }
+  }, [error, token, queryClient]);
+
   const loginMutation = useMutation({
     mutationFn: AuthService.login,
     onSuccess: (data) => {
       const { access_token, user } = data;
-      Cookies.set('access_token', access_token, { expires: 7 }); // 7 days
+      Cookies.set('access_token', access_token, { expires: 7 });
       setToken(access_token);
       queryClient.setQueryData(['user', 'profile'], user);
     },
   });
 
-  // Register mutation
   const registerMutation = useMutation({
     mutationFn: AuthService.register,
     onSuccess: (data) => {
       const { access_token, user } = data;
-      Cookies.set('access_token', access_token, { expires: 7 }); // 7 days
+      Cookies.set('access_token', access_token, { expires: 7 });
       setToken(access_token);
       queryClient.setQueryData(['user', 'profile'], user);
     },
   });
 
-  // Logout function
   const logout = () => {
     Cookies.remove('access_token');
     setToken(null);
     queryClient.clear();
+    if (typeof window !== 'undefined') {
+      window.location.href = '/auth/login';
+    }
   };
 
-  // Login function
   const login = async (credentials: LoginCredentials): Promise<void> => {
     await loginMutation.mutateAsync(credentials);
   };
@@ -79,8 +93,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     await registerMutation.mutateAsync(credentials);
   };
 
-  const isLoading = isUserLoading || loginMutation.isPending || registerMutation.isPending;
-  const isAuthenticated = !!user && !!token;
+  const isLoading =
+    isUserLoading || loginMutation.isPending || registerMutation.isPending;
+  const isAuthenticated = !!user && !!token && !error;
 
   const contextValue: AuthContextType = {
     user: user || null,
@@ -93,8 +108,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 }

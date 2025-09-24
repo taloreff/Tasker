@@ -33,10 +33,15 @@ class ApiClient {
       (response) => response,
       (error) => {
         if (error.response?.status === 401) {
-          // Clear token and redirect to login
-          Cookies.remove('access_token');
-          if (typeof window !== 'undefined') {
-            window.location.href = '/auth/login';
+          const isAuthRequest = error.config?.url?.includes('/auth/login') || 
+                                error.config?.url?.includes('/auth/register');
+          const isAuthPage = typeof window !== 'undefined' && 
+                            (window.location.pathname.startsWith('/auth/') || 
+                             window.location.pathname === '/');
+          
+          if (!isAuthRequest && !isAuthPage) {
+            Cookies.remove('access_token');
+              window.location.href = '/auth/login';
           }
         }
         return Promise.reject(error);

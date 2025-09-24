@@ -121,7 +121,7 @@ export class TaskService {
     });
 
     if (!task) {
-      this.logger.warn(`Task not found: ${id}`);
+      this.logger.error(`Task not found: ${id}`);
       throw new NotFoundException(`Task ${id} not found`);
     }
 

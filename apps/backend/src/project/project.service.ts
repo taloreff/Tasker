@@ -80,7 +80,7 @@ export class ProjectService {
     });
 
     if (!project) {
-      this.logger.warn(`Project not found: ${id}`);
+      this.logger.error(`Project not found: ${id}`);
       throw new NotFoundException(`Project ${id} not found`);
     }
 
@@ -260,7 +260,7 @@ export class ProjectService {
       }
     }
 
-    this.logger.warn(`User ${userId} denied access to project ${project.id}`);
+    this.logger.error(`User ${userId} denied access to project ${project.id}`);
     throw new ForbiddenException('You do not have access to this project');
   }
 
@@ -282,7 +282,7 @@ export class ProjectService {
       return; // Project owner has access
     }
 
-    this.logger.warn(
+    this.logger.error(
       `User ${userId} denied owner access to project ${project.id}`
     );
     throw new ForbiddenException(
@@ -394,7 +394,7 @@ export class ProjectService {
     // In the future, you might want more granular permissions
     const hasAccess = await this.checkUserProjectAccess(projectId, userId);
     if (!hasAccess) {
-      this.logger.warn(
+      this.logger.error(
         `User ${userId} denied edit access to project ${projectId}`
       );
       throw new ForbiddenException(

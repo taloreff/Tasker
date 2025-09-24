@@ -81,7 +81,7 @@ export class SubtaskService {
     });
 
     if (!subtask) {
-      this.logger.warn(`Subtask not found: ${id}`);
+      this.logger.error(`Subtask not found: ${id}`);
       throw new NotFoundException(`Subtask ${id} not found`);
     }
 

@@ -13,7 +13,13 @@ import { useAuth } from '@/providers/auth-provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -40,22 +46,23 @@ export default function LoginPage() {
       await login(data);
       toast.success('Welcome back!');
       router.push('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
-      toast.error('Invalid email or password');
+      const errorMessage =
+        error?.response?.data?.message ||
+        'Login failed. Please check your credentials and try again.';
+      toast.error(errorMessage);
     }
   };
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-      {/* Animated Background Effects */}
       <div className="absolute inset-0 w-full h-full">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
         <div className="absolute top-3/4 right-1/4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
         <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-4000"></div>
       </div>
 
-      {/* Floating Particles */}
       <div className="absolute inset-0">
         {[...Array(20)].map((_, i) => (
           <div
@@ -65,7 +72,7 @@ export default function LoginPage() {
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
               animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${3 + Math.random() * 4}s`
+              animationDuration: `${3 + Math.random() * 4}s`,
             }}
           >
             <Sparkles className="w-4 h-4 text-white/20" />
@@ -75,7 +82,6 @@ export default function LoginPage() {
 
       <div className="relative flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
-          {/* Header with Animation */}
           <div className="text-center animate-fade-in-up">
             <div className="flex justify-center mb-6">
               <div className="relative">
@@ -88,10 +94,11 @@ export default function LoginPage() {
             <h2 className="text-4xl font-bold bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent">
               Welcome back
             </h2>
-            <p className="mt-3 text-lg text-blue-100">Sign in to your Tasker account</p>
+            <p className="mt-3 text-lg text-blue-100">
+              Sign in to your Tasker account
+            </p>
           </div>
 
-          {/* Enhanced Card with Glassmorphism */}
           <Card className="mt-8 bg-white/10 backdrop-blur-xl border-white/20 shadow-2xl animate-fade-in-up animation-delay-200">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold text-white flex items-center justify-center gap-2">
@@ -104,9 +111,11 @@ export default function LoginPage() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                {/* Enhanced Email Field */}
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium text-white">
+                  <Label
+                    htmlFor="email"
+                    className="text-sm font-medium text-white"
+                  >
                     Email address
                   </Label>
                   <div className="relative group">
@@ -122,13 +131,17 @@ export default function LoginPage() {
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-600/20 to-blue-600/20 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                   </div>
                   {errors.email && (
-                    <p className="text-sm text-red-300 animate-shake">{errors.email.message}</p>
+                    <p className="text-sm text-red-300 animate-shake">
+                      {errors.email.message}
+                    </p>
                   )}
                 </div>
 
-                {/* Enhanced Password Field */}
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-medium text-white">
+                  <Label
+                    htmlFor="password"
+                    className="text-sm font-medium text-white"
+                  >
                     Password
                   </Label>
                   <div className="relative group">
@@ -155,11 +168,12 @@ export default function LoginPage() {
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-600/20 to-blue-600/20 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                   </div>
                   {errors.password && (
-                    <p className="text-sm text-red-300 animate-shake">{errors.password.message}</p>
+                    <p className="text-sm text-red-300 animate-shake">
+                      {errors.password.message}
+                    </p>
                   )}
                 </div>
 
-                {/* Enhanced Submit Button */}
                 <Button
                   type="submit"
                   className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transform transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
@@ -179,14 +193,15 @@ export default function LoginPage() {
                 </Button>
               </form>
 
-              {/* Enhanced Footer */}
               <div className="mt-8 text-center">
                 <div className="relative">
                   <div className="mb-4 flex items-center">
                     <div className="w-full border-t border-white/20"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-transparent text-white/80">New to Tasker?</span>
+                    <span className="px-4 bg-transparent text-white/80">
+                      New to Tasker?
+                    </span>
                   </div>
                 </div>
                 <div className="mt-4">

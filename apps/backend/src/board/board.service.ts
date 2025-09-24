@@ -77,7 +77,7 @@ export class BoardService {
     });
 
     if (!board) {
-      this.logger.warn(`Board not found: ${id}`);
+      this.logger.error(`Board not found: ${id}`);
       throw new NotFoundException(`Board ${id} not found`);
     }
 
@@ -138,7 +138,7 @@ export class BoardService {
     });
 
     if (existingBoards.length !== boardIds.length) {
-      this.logger.warn(`Some boards don't belong to project ${projectId}`);
+      this.logger.error(`Some boards don't belong to project ${projectId}`);
       throw new BadRequestException(
         'Some boards do not belong to this project'
       );

@@ -4,7 +4,7 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
-  Logger,
+  Logger
 } from '@nestjs/common';
 
 @Catch()
@@ -32,25 +32,30 @@ export class AllExceptionsFilter implements ExceptionFilter {
         status = exception.getStatus();
         message = exception.message;
       }
-      
-      // Log HTTP exceptions (client errors)
-      if (status >= 400 && status < 500) {
-        this.logger.warn(`HTTP ${status}: ${message} - Path: ${request?.url}`);
-      } else {
-        this.logger.error(`HTTP ${status}: ${message} - Path: ${request?.url}`);
-      }
-    } else if (exception instanceof Error) {
-      message = exception.message;
-      this.logger.error(`Unhandled Error: ${message} - Path: ${request?.url}`, exception.stack);
-    } else {
-      this.logger.error(`Unknown exception: ${JSON.stringify(exception)} - Path: ${request?.url}`);
-    }
 
-    response?.status?.(status)?.json?.({
-      statusCode: status,
-      message,
-      timestamp: new Date().toISOString(),
-      path: request?.url ?? '',
-    });
+      // Log HTTP exceptions (client errors)
+      if (status >= 400) {
+        this.logger.error(`HTTP ${status}: ${message} - Path: ${request?.url}`);
+      } else if (exception instanceof Error) {
+        message = exception.message;
+        this.logger.error(
+          `Unhandled Error: ${message} - Path: ${request?.url}`,
+          exception.stack
+        );
+      } else {
+        this.logger.error(
+          `Unknown exception: ${JSON.stringify(exception)} - Path: ${
+            request?.url
+          }`
+        );
+      }
+
+      response?.status?.(status)?.json?.({
+        statusCode: status,
+        message,
+        timestamp: new Date().toISOString(),
+        path: request?.url ?? ''
+      });
+    }
   }
 }
