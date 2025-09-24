@@ -6,25 +6,41 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, EyeOff, UserPlus, Stars, Rocket, CheckCircle, ArrowLeft } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  UserPlus,
+  Stars,
+  Rocket,
+  CheckCircle,
+  ArrowLeft,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useAuth } from '@/providers/auth-provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
-const registerSchema = z.object({
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const registerSchema = z
+  .object({
+    firstName: z.string().min(1, 'First name is required'),
+    lastName: z.string().min(1, 'Last name is required'),
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
@@ -48,9 +64,11 @@ export default function RegisterPage() {
       await registerUser(registrationData);
       toast.success('Account created successfully! Welcome to Tasker!');
       router.push('/dashboard');
-    } catch (error) {
-      console.error('Registration error:', error);
-      toast.error('Failed to create account. Please try again.');
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        'Failed to create account. Please try again.';
+      toast.error(errorMessage);
     }
   };
 
@@ -63,7 +81,6 @@ export default function RegisterPage() {
         <div className="absolute top-2/3 left-1/2 w-80 h-80 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-25 animate-pulse animation-delay-4000"></div>
       </div>
 
-      {/* Floating Stars */}
       <div className="absolute inset-0">
         {[...Array(15)].map((_, i) => (
           <div
@@ -73,7 +90,7 @@ export default function RegisterPage() {
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
               animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${4 + Math.random() * 3}s`
+              animationDuration: `${4 + Math.random() * 3}s`,
             }}
           >
             <Stars className="w-3 h-3 text-white/30" />
@@ -83,7 +100,6 @@ export default function RegisterPage() {
 
       <div className="relative flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-lg w-full space-y-8">
-          {/* Enhanced Header */}
           <div className="text-center animate-fade-in-up">
             <div className="flex justify-center mb-6">
               <div className="relative">
@@ -96,10 +112,11 @@ export default function RegisterPage() {
             <h2 className="text-4xl font-bold bg-gradient-to-r from-white via-emerald-200 to-cyan-200 bg-clip-text text-transparent">
               Join the Revolution
             </h2>
-            <p className="mt-3 text-lg text-emerald-100">Create your Tasker account and boost your productivity</p>
+            <p className="mt-3 text-lg text-emerald-100">
+              Create your Tasker account and boost your productivity
+            </p>
           </div>
 
-          {/* Enhanced Card with Different Glassmorphism */}
           <Card className="mt-8 bg-white/10 backdrop-blur-xl border-white/20 shadow-2xl animate-fade-in-up animation-delay-200">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold text-white flex items-center justify-center gap-2">
@@ -112,10 +129,12 @@ export default function RegisterPage() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                {/* Enhanced Name Fields */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName" className="text-sm font-medium text-white">
+                    <Label
+                      htmlFor="firstName"
+                      className="text-sm font-medium text-white"
+                    >
                       First name
                     </Label>
                     <div className="relative group">
@@ -131,12 +150,17 @@ export default function RegisterPage() {
                       <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-600/20 to-cyan-600/20 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                     </div>
                     {errors.firstName && (
-                      <p className="text-sm text-red-300 animate-shake">{errors.firstName.message}</p>
+                      <p className="text-sm text-red-300 animate-shake">
+                        {errors.firstName.message}
+                      </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="lastName" className="text-sm font-medium text-white">
+                    <Label
+                      htmlFor="lastName"
+                      className="text-sm font-medium text-white"
+                    >
                       Last name
                     </Label>
                     <div className="relative group">
@@ -152,14 +176,18 @@ export default function RegisterPage() {
                       <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-600/20 to-cyan-600/20 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                     </div>
                     {errors.lastName && (
-                      <p className="text-sm text-red-300 animate-shake">{errors.lastName.message}</p>
+                      <p className="text-sm text-red-300 animate-shake">
+                        {errors.lastName.message}
+                      </p>
                     )}
                   </div>
                 </div>
 
-                {/* Enhanced Email Field */}
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium text-white">
+                  <Label
+                    htmlFor="email"
+                    className="text-sm font-medium text-white"
+                  >
                     Email address
                   </Label>
                   <div className="relative group">
@@ -175,13 +203,17 @@ export default function RegisterPage() {
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-600/20 to-cyan-600/20 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                   </div>
                   {errors.email && (
-                    <p className="text-sm text-red-300 animate-shake">{errors.email.message}</p>
+                    <p className="text-sm text-red-300 animate-shake">
+                      {errors.email.message}
+                    </p>
                   )}
                 </div>
 
-                {/* Enhanced Password Field */}
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-medium text-white">
+                  <Label
+                    htmlFor="password"
+                    className="text-sm font-medium text-white"
+                  >
                     Password
                   </Label>
                   <div className="relative group">
@@ -208,13 +240,17 @@ export default function RegisterPage() {
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-600/20 to-cyan-600/20 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                   </div>
                   {errors.password && (
-                    <p className="text-sm text-red-300 animate-shake">{errors.password.message}</p>
+                    <p className="text-sm text-red-300 animate-shake">
+                      {errors.password.message}
+                    </p>
                   )}
                 </div>
 
-                {/* Enhanced Confirm Password Field */}
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium text-white">
+                  <Label
+                    htmlFor="confirmPassword"
+                    className="text-sm font-medium text-white"
+                  >
                     Confirm password
                   </Label>
                   <div className="relative group">
@@ -230,7 +266,9 @@ export default function RegisterPage() {
                     <button
                       type="button"
                       className="absolute inset-y-0 right-0 flex items-center pr-4 text-white/60 hover:text-white transition-colors duration-200"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                     >
                       {showConfirmPassword ? (
                         <EyeOff className="h-5 w-5" />
@@ -241,11 +279,12 @@ export default function RegisterPage() {
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-600/20 to-cyan-600/20 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                   </div>
                   {errors.confirmPassword && (
-                    <p className="text-sm text-red-300 animate-shake">{errors.confirmPassword.message}</p>
+                    <p className="text-sm text-red-300 animate-shake">
+                      {errors.confirmPassword.message}
+                    </p>
                   )}
                 </div>
 
-                {/* Enhanced Submit Button */}
                 <Button
                   type="submit"
                   className="w-full bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 text-white font-semibold py-3 px-6 rounded-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
@@ -265,14 +304,15 @@ export default function RegisterPage() {
                 </Button>
               </form>
 
-              {/* Enhanced Footer */}
               <div className="mt-8 text-center">
                 <div className="relative">
                   <div className="mb-4 flex items-center">
                     <div className="w-full border-t border-white/20"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-transparent text-white/80">Already have an account?</span>
+                    <span className="px-4 bg-transparent text-white/80">
+                      Already have an account?
+                    </span>
                   </div>
                 </div>
                 <div className="mt-4">

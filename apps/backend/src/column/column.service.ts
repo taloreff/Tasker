@@ -71,7 +71,7 @@ export class ColumnService {
     });
 
     if (!column) {
-      this.logger.warn(`Column not found: ${id}`);
+      this.logger.error(`Column not found: ${id}`);
       throw new NotFoundException(`Column ${id} not found`);
     }
 
@@ -119,7 +119,7 @@ export class ColumnService {
     });
 
     if (existingColumns.length !== columnIds.length) {
-      this.logger.warn(`Some columns don't belong to board ${boardId}`);
+      this.logger.error(`Some columns don't belong to board ${boardId}`);
       throw new BadRequestException('Some columns do not belong to this board');
     }
 

@@ -19,7 +19,7 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
     
     if (!user) {
-      this.logger.warn(`User not found with email: ${email}`);
+      this.logger.error(`User not found with email: ${email}`);
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -27,7 +27,7 @@ export class AuthService {
     
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
-      this.logger.warn(`Invalid password for user: ${email}`);
+      this.logger.error(`Invalid password for user: ${email}`);
       throw new UnauthorizedException('Invalid credentials');
     }
 

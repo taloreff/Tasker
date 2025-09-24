@@ -68,7 +68,7 @@ export class TeamService {
     });
 
     if (!team) {
-      this.logger.warn(`Team not found: ${id}`);
+      this.logger.error(`Team not found: ${id}`);
       throw new NotFoundException(`Team ${id} not found`);
     }
 
@@ -123,7 +123,7 @@ export class TeamService {
     });
 
     if (existingMembership) {
-      this.logger.warn(`User ${addMemberDto.userId} is already a member of team ${teamId}`);
+      this.logger.error(`User ${addMemberDto.userId} is already a member of team ${teamId}`);
       throw new BadRequestException('User is already a member of this team');
     }
 
@@ -154,7 +154,7 @@ export class TeamService {
     });
 
     if (!membership) {
-      this.logger.warn(`User ${userId} is not a member of team ${teamId}`);
+      this.logger.error(`User ${userId} is not a member of team ${teamId}`);
       throw new NotFoundException('User is not a member of this team');
     }
 
@@ -191,7 +191,7 @@ export class TeamService {
     });
 
     if (!membership) {
-      this.logger.warn(`User ${userId} denied admin access to team ${teamId}`);
+      this.logger.error(`User ${userId} denied admin access to team ${teamId}`);
       throw new ForbiddenException('You must be a team admin or workspace owner to perform this action');
     }
   }

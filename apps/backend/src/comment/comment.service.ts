@@ -110,7 +110,7 @@ export class CommentService {
     });
 
     if (!comment) {
-      this.logger.warn(`Comment not found: ${id}`);
+      this.logger.error(`Comment not found: ${id}`);
       throw new NotFoundException(`Comment ${id} not found`);
     }
 

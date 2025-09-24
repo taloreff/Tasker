@@ -31,7 +31,7 @@ import { ROLES_KEY } from '../decorators/roles.decorator';
   
       const { user } = context.switchToHttp().getRequest();
       if (!user) {
-        this.logger.warn('No user in request');
+        this.logger.error('No user in request');
         throw new ForbiddenException('No user in request');
       }
   
@@ -40,7 +40,7 @@ import { ROLES_KEY } from '../decorators/roles.decorator';
       
       const hasRole = user.roles?.some((r) => requiredRoles.includes(r.name));
       if (!hasRole) {
-        this.logger.warn(`User ${user.email} does not have required roles`);
+        this.logger.error(`User ${user.email} does not have required roles`);
         throw new ForbiddenException('You do not have permission');
       }
   

@@ -80,7 +80,7 @@ export class LabelService {
     });
 
     if (!label) {
-      this.logger.warn(`Label not found: ${id}`);
+      this.logger.error(`Label not found: ${id}`);
       throw new NotFoundException(`Label ${id} not found`);
     }
 

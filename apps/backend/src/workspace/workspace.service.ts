@@ -51,13 +51,13 @@ export class WorkspaceService {
     });
 
     if (!workspace) {
-      this.logger.warn(`Workspace not found: ${id}`);
+      this.logger.error(`Workspace not found: ${id}`);
       throw new NotFoundException(`Workspace ${id} not found`);
     }
 
     // Check if user has access (owner for now)
     if (workspace.ownerId !== userId) {
-      this.logger.warn(`User ${userId} denied access to workspace ${id}`);
+      this.logger.error(`User ${userId} denied access to workspace ${id}`);
       throw new ForbiddenException('Access denied to this workspace');
     }
 
