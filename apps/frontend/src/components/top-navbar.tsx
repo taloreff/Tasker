@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
 import { Bell, Settings, User, ChevronDown, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,7 +16,7 @@ import { useAuth } from '@/providers/auth-provider';
 import { useGetWorkspacesQuery } from '@/hooks/use-workspace';
 import { Loader } from './loader';
 import { Workspace } from '@/types';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { CreateWorkspaceModal } from '@/app/workspaces/create-workspace-modal';
 
 interface WorkspaceSelectorProps {
@@ -31,14 +30,9 @@ function WorkspaceSelector({
   selectedWorkspace,
   onCreateWorkspace,
 }: WorkspaceSelectorProps) {
-  const { data: workspaces, isLoading } = useGetWorkspacesQuery() as {
+  const { data: workspaces } = useGetWorkspacesQuery() as {
     data: Workspace[];
-    isLoading: boolean;
   };
-
-  if (isLoading) {
-    return <Loader />;
-  }
 
   const handleCreateWorkspace = () => {
     onCreateWorkspace();
@@ -92,23 +86,12 @@ function WorkspaceSelector({
 }
 
 export function TopNavbar() {
-  const { user, logout, isAuthenticated, isLoading } = useAuth();
-  const router = useRouter();
+  const { user, logout } = useAuth();
 
   const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(
     null
   );
   const [isCreating, setIsCreating] = useState(false);
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push('/auth/login');
-    }
-  }, [isAuthenticated, isLoading, router]);
-
-  if (isLoading || !isAuthenticated) {
-    return <Loader />;
-  }
 
   const handleWorkspaceSelected = (workspace: Workspace) => {
     setCurrentWorkspace(workspace);
