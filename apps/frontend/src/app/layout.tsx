@@ -1,5 +1,6 @@
 import './global.css';
 import { Providers } from '@/providers';
+import { AppLayout } from '@/components/app-layout';
 
 export const metadata = {
   title: 'Tasker - Project Management',
@@ -15,7 +16,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
-          {children}
+          <AppLayout>
+            {children}
+          </AppLayout>
         </Providers>
       </body>
     </html>

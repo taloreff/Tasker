@@ -8,7 +8,7 @@ import {
   AuthContextType,
   LoginCredentials,
   RegisterCredentials,
-} from '@/types/auth';
+} from '@/types';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
