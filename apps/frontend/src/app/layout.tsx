@@ -1,6 +1,6 @@
 import './global.css';
 import { Providers } from '@/providers';
-import ConditionalLayout from '@/components/conditional-layout';
+import { AppLayout } from '@/components/app-layout';
 
 export const metadata = {
   title: 'Tasker - Project Management',
@@ -16,9 +16,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
-          <ConditionalLayout>
+          <AppLayout>
             {children}
-          </ConditionalLayout>
+          </AppLayout>
         </Providers>
       </body>
     </html>

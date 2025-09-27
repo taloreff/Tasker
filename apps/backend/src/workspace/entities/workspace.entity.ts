@@ -23,6 +23,12 @@ export class Workspace {
   @Index()
   name: string;
 
+  @Column({ name: 'description', nullable: true })
+  description?: string;
+
+  @Column({ name: 'color', default: '#FF5733' })
+  color: string;
+
   @Column({ name: 'owner_id' })
   @Index()
   ownerId: string;

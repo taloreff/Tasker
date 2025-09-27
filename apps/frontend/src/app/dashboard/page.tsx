@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/card';
 
 export default function DashboardPage() {
-  const { user, logout, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -21,11 +21,6 @@ export default function DashboardPage() {
       router.push('/auth/login');
     }
   }, [isAuthenticated, isLoading, router]);
-
-  const handleLogout = () => {
-    logout();
-    router.push('/auth/login');
-  };
 
   if (isLoading) {
     return (
@@ -43,85 +38,66 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex-1 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Welcome back, {user?.firstName}!
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Manage your projects and tasks efficiently
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold">
+          Welcome back, {user?.firstName}!
+        </h1>
+        <p className="text-muted-foreground">
+          Manage your projects and tasks efficiently
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Welcome to Tasker</CardTitle>
+            <CardDescription>
+              Your project management workspace is ready
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              Start by creating your first workspace or joining an existing
+              team.
             </p>
-          </div>
-          <Button onClick={handleLogout} variant="outline">
-            Sign Out
-          </Button>
-        </div>
+            <Button className="w-full">Create Workspace</Button>
+          </CardContent>
+        </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Welcome to Tasker</CardTitle>
-              <CardDescription>
-                Your project management workspace is ready
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                Start by creating your first workspace or joining an existing
-                team.
-              </p>
-              <Button className="mt-4 w-full">Create Workspace</Button>
-            </CardContent>
-          </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>
+              Get started with these common tasks
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Button variant="ghost" className="w-full justify-start">
+              Create New Project
+            </Button>
+            <Button variant="ghost" className="w-full justify-start">
+              Join Team
+            </Button>
+            <Button variant="ghost" className="w-full justify-start">
+              View All Tasks
+            </Button>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>
-                Get started with these common tasks
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <Button variant="ghost" className="w-full justify-start">
-                  Create New Project
-                </Button>
-                <Button variant="ghost" className="w-full justify-start">
-                  Join Team
-                </Button>
-                <Button variant="ghost" className="w-full justify-start">
-                  View All Tasks
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Account Info</CardTitle>
-              <CardDescription>Your account details</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm">
-                <div>
-                  <span className="font-medium">Name:</span> {user?.firstName}{' '}
-                  {user?.lastName}
-                </div>
-                <div>
-                  <span className="font-medium">Email:</span> {user?.email}
-                </div>
-                <div>
-                  <span className="font-medium">Member since:</span>{' '}
-                  {user?.createdAt
-                    ? new Date(user.createdAt).toLocaleDateString()
-                    : 'N/A'}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>
+              Your latest updates and notifications
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              No recent activity to show
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
