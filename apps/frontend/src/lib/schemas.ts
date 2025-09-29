@@ -6,6 +6,12 @@ export const workspaceSchema = z.object({
   description: z.string().optional(),
 });
 
+export const boardSchema = z.object({
+  name: z.string().min(3, 'Board name must be at least 3 characters'),
+  description: z.string().optional(),
+  color: z.string().min(3, 'Color must be selected'),
+});
+
 export const teamSchema = z.object({
   name: z
     .string()

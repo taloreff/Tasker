@@ -1,5 +1,6 @@
 export const REACT_QUERY_KEYS = {
     WORKSPACES: 'workspaces',
+    BOARDS: 'boards',
     TASKS: 'tasks',
     PROJECTS: 'projects',
     TEAMS: 'teams',
