@@ -1,100 +1,74 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column as TypeOrmColumn,
+  Column,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
   ManyToMany,
+  OneToMany,
   JoinColumn,
   JoinTable,
   Index,
-  OneToMany
 } from 'typeorm';
+import { BoardGroup } from '../../column/entities/column.entity';
 import { User } from '../../user/entities/user.entity';
-import { Board } from '../../board/entities/board.entity';
-import { Column } from '../../column/entities/column.entity';
-import { Subtask } from '../../subtask/entities/subtask.entity';
 import { Label } from '../../label/entities/label.entity';
 
-export enum TaskStatus {
-  TODO = 'TODO',
-  IN_PROGRESS = 'IN_PROGRESS',
-  REVIEW = 'REVIEW',
-  DONE = 'DONE',
-  BLOCKED = 'BLOCKED',
-  CANCELLED = 'CANCELLED'
+export enum ItemStatus {
+  TODO = 'todo',
+  IN_PROGRESS = 'in_progress',
+  REVIEW = 'review', 
+  DONE = 'done',
+  BLOCKED = 'blocked',
+  CANCELLED = 'cancelled'
 }
 
-export enum TaskPriority {
-  LOW = 'LOW',
-  MEDIUM = 'MEDIUM',
-  HIGH = 'HIGH',
-  URGENT = 'URGENT'
+export enum ItemPriority {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  URGENT = 'urgent'
 }
 
-@Entity({ name: 'tasks' })
-export class Task {
+@Entity({ name: 'board_items' })
+@Index(['groupId', 'position'])
+export class BoardItem {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @TypeOrmColumn({ length: 200 })
-  @Index()
-  title: string;
+  @Column({ length: 200 })
+  name: string;
 
-  @TypeOrmColumn({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @TypeOrmColumn({
+  @Column({
     type: 'enum',
-    enum: TaskStatus,
-    default: TaskStatus.TODO
+    enum: ItemStatus,
+    default: ItemStatus.TODO
   })
-  status: TaskStatus;
+  status: ItemStatus;
 
-  @TypeOrmColumn({
+  @Column({
     type: 'enum',
-    enum: TaskPriority,
-    default: TaskPriority.MEDIUM
+    enum: ItemPriority,
+    default: ItemPriority.MEDIUM
   })
-  priority: TaskPriority;
+  priority: ItemPriority;
 
-  @TypeOrmColumn({ name: 'due_date', type: 'date', nullable: true })
-  dueDate?: Date;
+  @Column({ name: 'group_id' })
+  groupId: string;
 
-  @TypeOrmColumn({ name: 'created_by_id' })
-  @Index()
+  @Column({ name: 'created_by_id' })
   createdById: string;
 
-  @TypeOrmColumn({ name: 'column_id' })
-  @Index()
-  columnId: string;
+  @Column({ name: 'assignee_id', nullable: true })
+  assigneeId?: string;
 
-  @TypeOrmColumn({ name: 'board_id' })
-  @Index()
-  boardId: string;
-
-  @TypeOrmColumn({ type: 'int', default: 0 })
+  @Column({ type: 'int', default: 0 })
   position: number;
-
-  @TypeOrmColumn({
-    name: 'estimated_hours',
-    type: 'decimal',
-    precision: 5,
-    scale: 2,
-    nullable: true
-  })
-  estimatedHours?: number;
-
-  @TypeOrmColumn({
-    name: 'actual_hours',
-    type: 'decimal',
-    precision: 5,
-    scale: 2,
-    nullable: true
-  })
-  actualHours?: number;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
@@ -102,43 +76,20 @@ export class Task {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
-  deletedAt?: Date;
+  @ManyToOne(() => BoardGroup)
+  @JoinColumn({ name: 'group_id' })
+  group: BoardGroup;
 
-  @ManyToOne(() => User, { eager: false })
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'created_by_id' })
   createdBy: User;
 
-  @ManyToOne(() => Column, { eager: false })
-  @JoinColumn({ name: 'column_id' })
-  column: Column;
-
-  @ManyToOne(() => Board, { eager: false })
-  @JoinColumn({ name: 'board_id' })
-  board: Board;
-
-  @OneToMany(
-    () => Subtask,
-    subtask => subtask.task
-  )
-  subtasks: Subtask[];
-
-  @ManyToMany(() => User)
-  @JoinTable({
-    name: 'task_assignees',
-    joinColumn: { name: 'task_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' }
-  })
-  assignees: User[];
-
-  @ManyToMany(
-    () => Label,
-    label => label.tasks
-  )
-  @JoinTable({
-    name: 'task_labels',
-    joinColumn: { name: 'task_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'label_id', referencedColumnName: 'id' }
-  })
-  labels: Label[];
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'assignee_id' })
+  assignee?: User;
 }
+
+// Aliases for backward compatibility
+export const Task = BoardItem;
+export const TaskStatus = ItemStatus;
+export const TaskPriority = ItemPriority;

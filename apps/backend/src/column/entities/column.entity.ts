@@ -1,36 +1,55 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column as TypeOrmColumn,
+  Column as DBColumn,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
   OneToMany,
   JoinColumn,
-  Index,
+  Index
 } from 'typeorm';
 import { Board } from '../../board/entities/board.entity';
-import { Task } from '../../task/entities/task.entity';
 
-@Entity({ name: 'columns' })
-export class Column {
+export enum GroupType {
+  STATUS = 'status',
+  PRIORITY = 'priority',
+  CATEGORY = 'category',
+  CUSTOM = 'custom'
+}
+
+@Entity({ name: 'board_groups' })
+@Index(['boardId', 'position'])
+export class BoardGroup {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @TypeOrmColumn({ length: 100 })
-  @Index()
+  @DBColumn({ length: 100 })
   name: string;
 
-  @TypeOrmColumn({ name: 'board_id' })
+  @DBColumn({ type: 'text', nullable: true })
+  description?: string;
+
+  @DBColumn({
+    type: 'enum',
+    enum: GroupType,
+    default: GroupType.STATUS
+  })
+  groupType: GroupType;
+
+  @DBColumn({ length: 7, nullable: true })
+  color?: string;
+
+  @DBColumn({ name: 'board_id' })
   @Index()
   boardId: string;
 
-  @TypeOrmColumn({ type: 'int', default: 0 })
+  @DBColumn({ type: 'int', default: 0 })
   position: number;
 
-  @TypeOrmColumn({ length: 7, nullable: true })
-  color?: string;
+  @DBColumn({ name: 'is_collapsed', type: 'boolean', default: false })
+  isCollapsed: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
@@ -41,10 +60,13 @@ export class Column {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt?: Date;
 
+  // Relationships
   @ManyToOne(() => Board, { eager: false })
   @JoinColumn({ name: 'board_id' })
   board: Board;
 
-  @OneToMany(() => Task, (task) => task.column)
-  tasks: Task[];
+  @OneToMany('BoardItem', 'group')
+  items: object[];
 }
+
+export const Column = BoardGroup;

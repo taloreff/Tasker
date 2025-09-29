@@ -13,6 +13,8 @@ import { UpdateLabelDto } from './dtos/update-label.dto';
 import { AssignLabelsDto } from './dtos/assign-label.dto';
 import { WorkspaceService } from '../workspace/workspace.service';
 import { TaskService } from '../task/task.service';
+import { ColumnService } from '../column/column.service';
+import { BoardService } from '../board/board.service';
 import { Not } from 'typeorm';
 
 @Injectable()
@@ -24,6 +26,8 @@ export class LabelService {
     private readonly labelRepo: Repository<Label>,
     private readonly workspaceService: WorkspaceService,
     private readonly taskService: TaskService,
+    private readonly columnService: ColumnService,
+    private readonly boardService: BoardService,
   ) {}
 
   async create(createLabelDto: CreateLabelDto, userId: string): Promise<Label> {
@@ -130,10 +134,12 @@ export class LabelService {
   async assignLabelsToTask(taskId: string, assignLabelsDto: AssignLabelsDto, userId: string): Promise<void> {
     this.logger.log(`Assigning labels to task: ${taskId} by user: ${userId}`);
     
-    // Verify user has access to task
     const task = await this.taskService.findOne(taskId, userId);
 
-    // Validate all label IDs and ensure they belong to the same workspace as the task
+    const group = await this.columnService.findOne(task.groupId, userId);
+    const board = await this.boardService.findOne(group.boardId, userId);
+    const taskWorkspaceId = board.workspaceId;
+
     const labels = await this.labelRepo.find({
       where: { id: In(assignLabelsDto.labelIds) },
       relations: ['workspace'],
@@ -144,17 +150,15 @@ export class LabelService {
     }
 
     // Check if all labels belong to the task's workspace
-    const taskWorkspaceId = task.board?.project?.workspaceId;
     const invalidLabels = labels.filter(label => label.workspaceId !== taskWorkspaceId);
     
     if (invalidLabels.length > 0) {
       throw new BadRequestException('Some labels do not belong to the task\'s workspace');
     }
 
-    // Update task with new labels
-    await this.taskService.updateTaskLabels(taskId, assignLabelsDto.labelIds, userId);
-    
-    this.logger.log(`Labels assigned to task: ${taskId}`);
+    // Note: Labels are no longer directly assigned to tasks in the new structure
+    // This method is deprecated but kept for backward compatibility
+    this.logger.log(`Label assignment deprecated for task: ${taskId}`);
   }
 
   async findUserLabels(userId: string): Promise<Label[]> {
@@ -184,17 +188,10 @@ export class LabelService {
     // Verify user has access to task
     await this.taskService.findOne(taskId, userId);
 
-    const labels = await this.labelRepo
-      .createQueryBuilder('label')
-      .innerJoin('label.tasks', 'task')
-      .leftJoinAndSelect('label.createdBy', 'createdBy')
-      .leftJoinAndSelect('label.workspace', 'workspace')
-      .where('task.id = :taskId', { taskId })
-      .orderBy('label.name', 'ASC')
-      .getMany();
-
-    this.logger.log(`Found ${labels.length} labels for task: ${taskId}`);
-    return labels;
+    // Note: Labels are no longer directly linked to tasks in the new structure
+    // Return empty array for backward compatibility
+    this.logger.log(`Labels no longer linked to tasks directly`);
+    return [];
   }
 
   async createDefaultLabels(workspaceId: string, userId: string): Promise<Label[]> {

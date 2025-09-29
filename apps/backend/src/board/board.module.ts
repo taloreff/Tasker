@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Board } from './entities/board.entity';
+import { BoardView } from './entities/board-view.entity';
 import { BoardService } from './board.service';
 import { BoardController } from './board.controller';
-import { ProjectModule } from '../project/project.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Board]),
-    ProjectModule,
+    TypeOrmModule.forFeature([Board, BoardView]),
   ],
   controllers: [BoardController],
   providers: [BoardService],

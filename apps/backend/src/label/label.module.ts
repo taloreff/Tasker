@@ -5,12 +5,16 @@ import { LabelService } from './label.service';
 import { LabelController } from './label.controller';
 import { WorkspaceModule } from '../workspace/workspace.module';
 import { TaskModule } from '../task/task.module';
+import { ColumnModule } from '../column/column.module';
+import { BoardModule } from '../board/board.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Label]),
     WorkspaceModule,
     TaskModule,
+    ColumnModule,
+    BoardModule,
   ],
   controllers: [LabelController],
   providers: [LabelService],

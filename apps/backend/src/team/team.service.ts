@@ -117,6 +117,15 @@ export class TeamService {
     // Verify the user exists
     await this.userService.findOne(addMemberDto.userId);
 
+    // IMPORTANT: Verify that the user is a member of the workspace first
+    // Users must be workspace members before they can join teams
+    try {
+      await this.workspaceService.findOne(team.workspaceId, addMemberDto.userId);
+    } catch (error) {
+      this.logger.error(`User ${addMemberDto.userId} is not a member of workspace ${team.workspaceId}`);
+      throw new BadRequestException('User must be a workspace member before joining a team');
+    }
+
     // Check if user is already a member
     const existingMembership = await this.userTeamRoleRepo.findOne({
       where: { teamId, userId: addMemberDto.userId },

@@ -6,10 +6,12 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
   Index,
 } from 'typeorm';
 import { Workspace } from '../../workspace/entities/workspace.entity';
+import { UserTeamRole } from './user_team_role.entity';
 
 @Entity({ name: 'teams' })
 export class Team {
@@ -19,6 +21,9 @@ export class Team {
   @Column({ length: 100 })
   @Index()
   name: string;
+
+  @Column({ type: 'text', nullable: true })
+  description?: string;
 
   @Column({ name: 'workspace_id' })
   @Index()
@@ -37,4 +42,7 @@ export class Team {
   @ManyToOne(() => Workspace, { eager: false })
   @JoinColumn({ name: 'workspace_id' })
   workspace: Workspace;
+
+  @OneToMany(() => UserTeamRole, (userTeamRole) => userTeamRole.team)
+  userTeamRoles: UserTeamRole[];
 }
