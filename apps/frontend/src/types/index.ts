@@ -213,3 +213,18 @@ export interface WorkspaceProductivityData {
   completed: number;
   total: number;
 }
+
+export interface Team {
+  id: string;
+  name: string;
+  description?: string;
+  workspaceId: string;
+  memberCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateTeamData {
+  name: string;
+  description?: string;
+}

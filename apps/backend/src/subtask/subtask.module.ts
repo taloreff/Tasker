@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Subtask } from './entities/subtask.entity';
+import { BoardSubitem } from './entities/subtask.entity';
 import { SubtaskService } from './subtask.service';
 import { SubtaskController } from './subtask.controller';
 import { TaskModule } from '../task/task.module';
@@ -8,7 +8,7 @@ import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Subtask]),
+    TypeOrmModule.forFeature([BoardSubitem]),
     TaskModule,
     UserModule,
   ],

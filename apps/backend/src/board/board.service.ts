@@ -1,13 +1,12 @@
 import {
   Injectable,
   Logger,
-  NotFoundException,
-  BadRequestException
+  NotFoundException
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Board } from './entities/board.entity';
-import { ProjectService } from '../project/project.service';
+import { WorkspaceService } from '../workspace/workspace.service';
 import { CreateBoardDto } from './dtos/create-board.dto';
 import { UpdateBoardDto } from './dtos/update-board.dto';
 import { ReorderBoardsDto } from './dtos/reorder-board.dto';
@@ -19,52 +18,41 @@ export class BoardService {
   constructor(
     @InjectRepository(Board)
     private readonly boardRepo: Repository<Board>,
-    private readonly projectService: ProjectService
+    private readonly workspaceService: WorkspaceService
   ) {}
 
   async create(createBoardDto: CreateBoardDto, userId: string): Promise<Board> {
     this.logger.log(
-      `Creating board: ${createBoardDto.name} in project: ${createBoardDto.projectId} by user: ${userId}`
+      `Creating board: ${createBoardDto.name} in workspace: ${createBoardDto.workspaceId} by user: ${userId}`
     );
 
-    // Verify user has access to project
-    await this.projectService.findOne(createBoardDto.projectId, userId);
+    await this.workspaceService.findOne(createBoardDto.workspaceId, userId);
 
-    // If no position specified, put at the end
-    if (createBoardDto.position === undefined) {
-      const maxPosition = await this.boardRepo
-        .createQueryBuilder('board')
-        .select('MAX(board.position)', 'max')
-        .where('board.projectId = :projectId', {
-          projectId: createBoardDto.projectId
-        })
-        .getRawOne();
-
-      createBoardDto.position = (maxPosition?.max || 0) + 1;
-    }
-
-    const board = this.boardRepo.create(createBoardDto);
-    const savedBoard = await this.boardRepo.save(board);
-
-    this.logger.log(`Board created: ${savedBoard.id}`);
-    return savedBoard;
-  }
-
-  async findAllByProject(projectId: string, userId: string): Promise<Board[]> {
-    this.logger.log(
-      `Finding boards in project: ${projectId} for user: ${userId}`
-    );
-
-    // Verify user has access to project
-    await this.projectService.findOne(projectId, userId);
-
-    const boards = await this.boardRepo.find({
-      where: { projectId },
-      relations: ['project'],
-      order: { position: 'ASC' }
+    const board = this.boardRepo.create({
+      ...createBoardDto,
+      ownerId: userId
     });
 
-    this.logger.log(`Found ${boards.length} boards in project: ${projectId}`);
+    const savedBoard = await this.boardRepo.save(board);
+    this.logger.log(`Board created: ${savedBoard.id}`);
+
+    return this.findOne(savedBoard.id, userId);
+  }
+
+  async findAllByWorkspace(workspaceId: string, userId: string): Promise<Board[]> {
+    this.logger.log(
+      `Finding boards in workspace: ${workspaceId} for user: ${userId}`
+    );
+
+    await this.workspaceService.findOne(workspaceId, userId);
+
+    const boards = await this.boardRepo.find({
+      where: { workspaceId },
+      relations: ['workspace', 'owner', 'assignedTeam'],
+      order: { createdAt: 'ASC' }
+    });
+
+    this.logger.log(`Found ${boards.length} boards in workspace: ${workspaceId}`);
     return boards;
   }
 
@@ -73,7 +61,7 @@ export class BoardService {
 
     const board = await this.boardRepo.findOne({
       where: { id },
-      relations: ['project']
+      relations: ['workspace', 'owner', 'assignedTeam']
     });
 
     if (!board) {
@@ -81,101 +69,72 @@ export class BoardService {
       throw new NotFoundException(`Board ${id} not found`);
     }
 
-    // Check if user has access to the project
-    await this.projectService.findOne(board.projectId, userId);
+    await this.workspaceService.findOne(board.workspaceId, userId);
 
     this.logger.log(`Board found: ${board.name} (ID: ${board.id})`);
     return board;
   }
 
-  async update(
-    id: string,
-    updateBoardDto: UpdateBoardDto,
-    userId: string
-  ): Promise<Board> {
+  async update(id: string, updateBoardDto: UpdateBoardDto, userId: string): Promise<Board> {
     this.logger.log(`Updating board: ${id} by user: ${userId}`);
 
     const board = await this.findOne(id, userId);
 
-    // Check if user can edit the project
-    await this.projectService.checkProjectEditAccess(board.projectId, userId);
 
     Object.assign(board, updateBoardDto);
     const updatedBoard = await this.boardRepo.save(board);
 
     this.logger.log(`Board updated: ${updatedBoard.id}`);
-    return updatedBoard;
+    return this.findOne(updatedBoard.id, userId);
   }
 
   async remove(id: string, userId: string): Promise<void> {
     this.logger.log(`Soft deleting board: ${id} by user: ${userId}`);
 
-    const board = await this.findOne(id, userId);
-
-    // Check if user can edit the project
-    await this.projectService.checkProjectEditAccess(board.projectId, userId);
+    await this.findOne(id, userId);
 
     await this.boardRepo.softDelete(id);
     this.logger.log(`Board soft deleted: ${id}`);
   }
 
-  async reorderBoards(
-    projectId: string,
-    reorderDto: ReorderBoardsDto,
-    userId: string
-  ): Promise<Board[]> {
-    this.logger.log(
-      `Reordering boards in project: ${projectId} by user: ${userId}`
-    );
+  async findBoardsByIds(workspaceId: string, boardIds: string[], userId: string): Promise<Board[]> {
+    this.logger.log(`Finding boards by IDs in workspace: ${workspaceId} for user: ${userId}`);
 
-    // Verify user has access to project
-    await this.projectService.checkProjectEditAccess(projectId, userId);
+    await this.workspaceService.findOne(workspaceId, userId);
 
-    // Validate all board IDs belong to the project
-    const boardIds = reorderDto.boards.map(b => b.id);
-    const existingBoards = await this.boardRepo.find({
-      where: { projectId, id: In(boardIds) }
+    const boards = await this.boardRepo.find({
+      where: { workspaceId, id: In(boardIds) }
     });
 
-    if (existingBoards.length !== boardIds.length) {
-      this.logger.error(`Some boards don't belong to project ${projectId}`);
-      throw new BadRequestException(
-        'Some boards do not belong to this project'
-      );
-    }
+    this.logger.log(`Found ${boards.length} boards by IDs`);
+    return boards;
+  }
 
-    // Update positions
-    const updatePromises = reorderDto.boards.map(boardUpdate =>
-      this.boardRepo.update(boardUpdate.id, { position: boardUpdate.position })
-    );
+  async reorderBoards(workspaceId: string, reorderDto: ReorderBoardsDto, userId: string): Promise<Board[]> {
+    this.logger.log(`Reordering boards in workspace: ${workspaceId} by user: ${userId}`);
 
-    await Promise.all(updatePromises);
+    await this.workspaceService.findOne(workspaceId, userId);
 
-    // Return updated boards in order
-    const updatedBoards = await this.findAllByProject(projectId, userId);
-    this.logger.log(`Boards reordered in project: ${projectId}`);
 
-    return updatedBoards;
+    this.logger.log(`Board reordering completed for workspace: ${workspaceId}`);
+    return this.findAllByWorkspace(workspaceId, userId);
   }
 
   async findUserBoards(userId: string): Promise<Board[]> {
     this.logger.log(`Finding all boards for user: ${userId}`);
 
-    // Get all projects user has access to
-    const userProjects = await this.projectService.findUserProjects(userId);
-    const projectIds = userProjects.map(p => p.id);
+    const userWorkspaces = await this.workspaceService.findUserWorkspaces(userId);
+    const workspaceIds = userWorkspaces.map(w => w.id);
 
-    if (projectIds.length === 0) {
+    if (workspaceIds.length === 0) {
       return [];
     }
 
-    const boards = await this.boardRepo
-      .createQueryBuilder('board')
-      .leftJoinAndSelect('board.project', 'project')
-      .where('board.projectId IN (:...projectIds)', { projectIds })
-      .orderBy('project.name', 'ASC')
-      .addOrderBy('board.position', 'ASC')
-      .getMany();
+    const boards = await this.boardRepo.find({
+      where: { workspaceId: In(workspaceIds) },
+      relations: ['workspace', 'owner', 'assignedTeam'],
+      order: { workspace: { name: 'ASC' }, name: 'ASC' }
+    });
 
     this.logger.log(`Found ${boards.length} boards for user: ${userId}`);
     return boards;

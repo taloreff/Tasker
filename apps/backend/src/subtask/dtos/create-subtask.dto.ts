@@ -4,7 +4,7 @@ export class CreateSubtaskDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(200)
-  title: string;
+  name: string;
 
   @IsString()
   @IsOptional()
@@ -15,14 +15,23 @@ export class CreateSubtaskDto {
   completed?: boolean = false;
 
   @IsUUID()
-  taskId: string;
+  itemId: string;
 
   @IsUUID()
   @IsOptional()
-  assignedToId?: string;
+  assigneeId?: string;
 
   @IsInt()
   @Min(0)
   @IsOptional()
   position?: number = 0;
+
+  // Backward compatibility
+  @IsString()
+  @IsOptional()
+  title?: string;
+
+  @IsUUID()
+  @IsOptional()
+  taskId?: string;
 }

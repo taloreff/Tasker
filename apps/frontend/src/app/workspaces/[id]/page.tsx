@@ -2,7 +2,9 @@
 
 import { useParams } from 'next/navigation';
 import { useGetWorkspaceByIdQuery } from '@/hooks/use-workspace';
+import { useGetTeamsByWorkspaceQuery } from '@/hooks/use-team';
 import { Loader } from '@/components/loader';
+import { TeamList } from '@/components/team/team-list';
 import { Button } from '@/components/ui/button';
 import { 
   Card, 
@@ -23,6 +25,7 @@ export default function WorkspaceDetailsPage() {
   const workspaceId = params.id as string;
   
   const { data: workspace, isLoading, error } = useGetWorkspaceByIdQuery(workspaceId);
+  const { data: teams, isLoading: teamsLoading, refetch: refetchTeams } = useGetTeamsByWorkspaceQuery(workspaceId);
 
   if (isLoading) {
     return (
@@ -75,7 +78,7 @@ export default function WorkspaceDetailsPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{teams?.length || 0}</div>
             <p className="text-xs text-muted-foreground">
               Active teams in this workspace
             </p>
@@ -110,31 +113,14 @@ export default function WorkspaceDetailsPage() {
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="space-y-6">
         {/* Teams Section */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Teams</CardTitle>
-                <CardDescription>
-                  Manage teams within this workspace
-                </CardDescription>
-              </div>
-              <Button size="sm">
-                <Plus className="w-4 h-4 mr-2" />
-                New Team
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-muted-foreground">
-              <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>No teams yet</p>
-              <p className="text-sm">Create your first team to get started</p>
-            </div>
-          </CardContent>
-        </Card>
+        <TeamList
+          workspaceId={workspaceId}
+          teams={teams}
+          isLoading={teamsLoading}
+          onRefresh={refetchTeams}
+        />
 
         {/* Projects Section */}
         <Card>

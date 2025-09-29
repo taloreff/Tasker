@@ -1,7 +1,7 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column as TypeOrmColumn,
+  Column,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
@@ -10,27 +10,37 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import { Project } from '../../project/entities/project.entity';
-import { Column } from '../../column/entities/column.entity';
+import { Workspace } from '../../workspace/entities/workspace.entity';
+import { User } from '../../user/entities/user.entity';
+import { Team } from '../../team/entities/team.entity';
 
 @Entity({ name: 'boards' })
+@Index(['workspaceId', 'name'])
 export class Board {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @TypeOrmColumn({ length: 100 })
+  @Column({ length: 100 })
   @Index()
   name: string;
 
-  @TypeOrmColumn({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @TypeOrmColumn({ name: 'project_id' })
+  @Column({ name: 'workspace_id' })
   @Index()
-  projectId: string;
+  workspaceId: string;
 
-  @TypeOrmColumn({ type: 'int', default: 0 })
-  position: number;
+  @Column({ name: 'owner_id' })
+  @Index()
+  ownerId: string;
+
+  @Column({ name: 'assigned_team_id', nullable: true })
+  @Index()
+  assignedTeamId?: string;
+
+  @Column({ length: 7, default: '#0073EA' })
+  color: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
@@ -41,10 +51,22 @@ export class Board {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt?: Date;
 
-  @ManyToOne(() => Project, (project) => project.boards, { eager: false })
-  @JoinColumn({ name: 'project_id' })
-  project: Project;
+  // Relationships
+  @ManyToOne(() => Workspace, { eager: false })
+  @JoinColumn({ name: 'workspace_id' })
+  workspace: Workspace;
 
-  @OneToMany(() => Column, (column) => column.board)
-  columns: Column[];
+  @ManyToOne(() => User, { eager: false })
+  @JoinColumn({ name: 'owner_id' })
+  owner: User;
+
+  @ManyToOne(() => Team, { eager: false, nullable: true })
+  @JoinColumn({ name: 'assigned_team_id' })
+  assignedTeam?: Team;
+
+  @OneToMany('BoardGroup', 'board')
+  groups: object[];
+
+  @OneToMany('BoardView', 'board')
+  views: object[];
 }

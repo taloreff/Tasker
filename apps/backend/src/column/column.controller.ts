@@ -31,7 +31,7 @@ export class ColumnController {
     if (boardId) {
       return this.columnService.findAllByBoard(boardId, req.user.id);
     }
-    return this.columnService.findUserColumns(req.user.id);
+    return this.columnService.findUserBoardGroups(req.user.id);
   }
 
   @Get(':id')
@@ -64,6 +64,6 @@ export class ColumnController {
 
   @Post('default')
   createDefaultColumns(@Query('boardId') boardId: string, @Request() req) {
-    return this.columnService.createDefaultColumns(boardId, req.user.id);
+    return this.columnService.createDefaultBoardGroups(boardId, req.user.id);
   }
 }

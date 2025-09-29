@@ -6,28 +6,26 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
-  ManyToMany,
   JoinColumn,
   Index,
 } from 'typeorm';
-import { User } from '../../user/entities/user.entity';
 import { Workspace } from '../../workspace/entities/workspace.entity';
-import { Task } from '../../task/entities/task.entity';
+import { User } from '../../user/entities/user.entity';
 
 @Entity({ name: 'labels' })
+@Index(['workspaceId', 'name'], { unique: true })
 export class Label {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 50 })
-  @Index()
+  @Column({ length: 100 })
   name: string;
 
   @Column({ type: 'text', nullable: true })
   description?: string;
 
   @Column({ length: 7 })
-  color: string; // Hex color code like #FF5733
+  color: string;
 
   @Column({ name: 'workspace_id' })
   @Index()
@@ -46,7 +44,7 @@ export class Label {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt?: Date;
 
-  // Relations
+  // Relationships
   @ManyToOne(() => Workspace, { eager: false })
   @JoinColumn({ name: 'workspace_id' })
   workspace: Workspace;
@@ -55,6 +53,6 @@ export class Label {
   @JoinColumn({ name: 'created_by_id' })
   createdBy: User;
 
-  @ManyToMany(() => Task, (task) => task.labels)
-  tasks: Task[];
+  // Note: Labels are no longer directly linked to tasks in the new structure
+  // Task-label relationships are managed separately if needed
 }

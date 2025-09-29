@@ -1,21 +1,8 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  DeleteDateColumn,
-  ManyToOne,
-  ManyToMany,
-  OneToMany,
-  JoinColumn,
-  JoinTable,
-  Index,
-} from 'typeorm';
-import { Workspace } from '../../workspace/entities/workspace.entity';
-import { User } from '../../user/entities/user.entity';
-import { Team } from '../../team/entities/team.entity';
-import { Board } from '../../board/entities/board.entity';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Workspace } from "../../workspace/entities/workspace.entity";
+import { User } from "../../user/entities/user.entity";
+import { Team } from "../../team/entities/team.entity";
+
 
 @Entity({ name: 'projects' })
 export class Project {
@@ -70,7 +57,4 @@ export class Project {
     inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
   })
   members: User[];
-
-  @OneToMany(() => Board, (board) => board.project)
-  boards: Board[];
 }

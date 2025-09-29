@@ -9,35 +9,32 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import { Task } from '../../task/entities/task.entity';
+import { BoardItem } from '../../task/entities/task.entity';
 import { User } from '../../user/entities/user.entity';
 
-@Entity({ name: 'subtasks' })
-export class Subtask {
+@Entity({ name: 'board_subitems' })
+@Index(['itemId', 'position'])
+export class BoardSubitem {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ length: 200 })
-  @Index()
-  title: string;
+  name: string;
 
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   completed: boolean;
 
-  @Column({ name: 'task_id' })
-  @Index()
-  taskId: string;
+  @Column({ name: 'item_id' })
+  itemId: string;
 
   @Column({ name: 'created_by_id' })
-  @Index()
   createdById: string;
 
-  @Column({ name: 'assigned_to_id', nullable: true })
-  @Index()
-  assignedToId?: string;
+  @Column({ name: 'assignee_id', nullable: true })
+  assigneeId?: string;
 
   @Column({ type: 'int', default: 0 })
   position: number;
@@ -48,19 +45,18 @@ export class Subtask {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
-  deletedAt?: Date;
+  @ManyToOne(() => BoardItem)
+  @JoinColumn({ name: 'item_id' })
+  item: BoardItem;
 
-  // Relations
-  @ManyToOne(() => Task, { eager: false })
-  @JoinColumn({ name: 'task_id' })
-  task: Task;
-
-  @ManyToOne(() => User, { eager: false })
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'created_by_id' })
   createdBy: User;
 
-  @ManyToOne(() => User, { eager: false })
-  @JoinColumn({ name: 'assigned_to_id' })
-  assignedTo?: User;
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'assignee_id' })
+  assignee?: User;
 }
+
+// Alias for backward compatibility
+export const Subtask = BoardSubitem;

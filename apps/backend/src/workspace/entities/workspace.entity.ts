@@ -13,6 +13,10 @@ import {
 import { User } from '../../user/entities/user.entity';
 import { Team } from '../../team/entities/team.entity';
 import { Project } from '../../project/entities/project.entity';
+import { WorkspaceMember } from '../../user/entities/workspace-member.entity';
+import { WorkspaceSettings } from './workspace-settings.entity';
+import { ActivityLog } from './activity-log.entity';
+import { Board } from '../../board/entities/board.entity';
 
 @Entity({ name: 'workspaces' })
 export class Workspace {
@@ -52,4 +56,16 @@ export class Workspace {
 
   @OneToMany(() => Project, (project) => project.workspace)
   projects: Project[];
+
+  @OneToMany(() => WorkspaceMember, (member) => member.workspace)
+  members: WorkspaceMember[];
+
+  @OneToMany(() => Board, (board) => board.workspace)
+  boards: Board[];
+
+  @OneToMany(() => WorkspaceSettings, (settings) => settings.workspace)
+  settings: WorkspaceSettings[];
+
+  @OneToMany(() => ActivityLog, (log) => log.workspace)
+  activityLogs: ActivityLog[];
 }

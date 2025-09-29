@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, MaxLength, IsUUID, IsOptional, IsInt, Min } from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength, IsUUID, IsOptional } from 'class-validator';
 
 export class CreateBoardDto {
   @IsString()
@@ -11,10 +11,17 @@ export class CreateBoardDto {
   description?: string;
 
   @IsUUID()
-  projectId: string;
+  workspaceId: string;
 
-  @IsInt()
-  @Min(0)
+  @IsString()
   @IsOptional()
-  position?: number = 0;
+  color?: string;
+
+  @IsUUID()
+  @IsOptional()
+  assignedTeamId?: string;
+
+  @IsUUID()
+  @IsOptional()
+  projectId?: string;
 }

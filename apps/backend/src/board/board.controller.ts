@@ -28,9 +28,9 @@ export class BoardController {
   }
 
   @Get()
-  findAll(@Query('projectId') projectId: string, @Request() req) {
-    if (projectId) {
-      return this.boardService.findAllByProject(projectId, req.user.id);
+  findAll(@Query('workspaceId') workspaceId: string, @Request() req) {
+    if (workspaceId) {
+      return this.boardService.findAllByWorkspace(workspaceId, req.user.id);
     }
     return this.boardService.findUserBoards(req.user.id);
   }

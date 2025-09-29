@@ -11,9 +11,12 @@ import {
   Index,
   JoinTable,
   ManyToMany,
+  OneToMany,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Role } from './role.entity';
+import { WorkspaceMember } from './workspace-member.entity';
+import { UserTeamRole } from '../../team/entities/user_team_role.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -47,10 +50,17 @@ export class User {
   @JoinTable({ name: 'user_roles' })
   roles: Role[];
 
+  @OneToMany(() => WorkspaceMember, (member) => member.user)
+  workspaceMemberships: WorkspaceMember[];
+
+  @OneToMany(() => UserTeamRole, (userTeamRole) => userTeamRole.user)
+  teamRoles: UserTeamRole[];
+
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
-    if (this.passwordHash) {
+    // Only hash if it's a plain text password (doesn't start with bcrypt hash prefix)
+    if (this.passwordHash && !this.passwordHash.startsWith('$2b$')) {
       this.passwordHash = await bcrypt.hash(this.passwordHash, 10);
     }
   }

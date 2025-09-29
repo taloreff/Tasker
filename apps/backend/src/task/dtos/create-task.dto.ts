@@ -1,30 +1,30 @@
 import { IsString, IsNotEmpty, MaxLength, IsUUID, IsOptional, IsEnum, IsInt, Min, IsNumber, IsArray, IsISO8601 } from 'class-validator';
-import { TaskStatus, TaskPriority } from '../entities/task.entity';
+import { ItemStatus, ItemPriority } from '../entities/task.entity';
 
 export class CreateTaskDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(200)
-  title: string;
+  name: string;
 
   @IsString()
   @IsOptional()
   description?: string;
 
-  @IsEnum(TaskStatus)
+  @IsEnum(ItemStatus)
   @IsOptional()
-  status?: TaskStatus = TaskStatus.TODO;
+  status?: ItemStatus = ItemStatus.TODO;
 
-  @IsEnum(TaskPriority)
+  @IsEnum(ItemPriority)
   @IsOptional()
-  priority?: TaskPriority = TaskPriority.MEDIUM;
+  priority?: ItemPriority = ItemPriority.MEDIUM;
 
   @IsISO8601({ strict: false })
   @IsOptional()
   dueDate?: string;
 
   @IsUUID()
-  columnId: string;
+  groupId: string;
 
   @IsUUID()
   boardId: string;
@@ -37,6 +37,19 @@ export class CreateTaskDto {
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsOptional()
   estimatedHours?: number;
+
+  @IsUUID()
+  @IsOptional()
+  assigneeId?: string;
+
+  // Backward compatibility properties
+  @IsString()
+  @IsOptional()
+  title?: string;
+
+  @IsUUID()
+  @IsOptional()
+  columnId?: string;
 
   @IsArray()
   @IsUUID(4, { each: true })
