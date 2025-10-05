@@ -44,7 +44,6 @@ export class Label {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt?: Date;
 
-  // Relationships
   @ManyToOne(() => Workspace, { eager: false })
   @JoinColumn({ name: 'workspace_id' })
   workspace: Workspace;
@@ -52,7 +51,4 @@ export class Label {
   @ManyToOne(() => User, { eager: false })
   @JoinColumn({ name: 'created_by_id' })
   createdBy: User;
-
-  // Note: Labels are no longer directly linked to tasks in the new structure
-  // Task-label relationships are managed separately if needed
 }

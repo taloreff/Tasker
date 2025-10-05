@@ -4,37 +4,32 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  DeleteDateColumn,
   ManyToOne,
-  ManyToMany,
-  OneToMany,
   JoinColumn,
-  JoinTable,
-  Index,
+  DeleteDateColumn
 } from 'typeorm';
-import { BoardGroup } from '../../column/entities/column.entity';
 import { User } from '../../user/entities/user.entity';
-import { Label } from '../../label/entities/label.entity';
+import { Board } from '../../board/entities/board.entity';
+import { Group } from '../../group/entities/group.entity';
 
-export enum ItemStatus {
+export enum TaskStatus {
   TODO = 'todo',
   IN_PROGRESS = 'in_progress',
-  REVIEW = 'review', 
+  REVIEW = 'review',
   DONE = 'done',
   BLOCKED = 'blocked',
   CANCELLED = 'cancelled'
 }
 
-export enum ItemPriority {
+export enum TaskPriority {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
   URGENT = 'urgent'
 }
 
-@Entity({ name: 'board_items' })
-@Index(['groupId', 'position'])
-export class BoardItem {
+@Entity({ name: 'tasks' })
+export class Task {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -44,31 +39,50 @@ export class BoardItem {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({
-    type: 'enum',
-    enum: ItemStatus,
-    default: ItemStatus.TODO
-  })
-  status: ItemStatus;
+  @Column({ type: 'enum', enum: TaskStatus, default: TaskStatus.TODO })
+  status: TaskStatus;
 
-  @Column({
-    type: 'enum',
-    enum: ItemPriority,
-    default: ItemPriority.MEDIUM
-  })
-  priority: ItemPriority;
+  @Column({ type: 'enum', enum: TaskPriority, default: TaskPriority.MEDIUM })
+  priority: TaskPriority;
 
-  @Column({ name: 'group_id' })
-  groupId: string;
+  @Column({ name: 'board_id' })
+  boardId: string;
+
+  @ManyToOne(
+    () => Board,
+    board => board.tasks,
+    { onDelete: 'CASCADE' }
+  )
+  @JoinColumn({ name: 'board_id' })
+  board: Board;
+
+  @Column({ type: 'uuid', nullable: true })
+  groupId?: string;
+
+  @ManyToOne(
+    () => Group,
+    group => group.tasks,
+    { nullable: true, onDelete: 'SET NULL' }
+  )
+  @JoinColumn({ name: 'group_id' })
+  group?: Group;
+
+  @Column({ type: 'float', default: 0 })
+  position: number;
+
+  @Column({ name: 'assignee_id', type: 'uuid', nullable: true })
+  assigneeId?: string;
+
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'assignee_id' })
+  assignee?: User;
 
   @Column({ name: 'created_by_id' })
   createdById: string;
 
-  @Column({ name: 'assignee_id', nullable: true })
-  assigneeId?: string;
-
-  @Column({ type: 'int', default: 0 })
-  position: number;
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'created_by_id' })
+  createdBy: User;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
@@ -76,20 +90,6 @@ export class BoardItem {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @ManyToOne(() => BoardGroup)
-  @JoinColumn({ name: 'group_id' })
-  group: BoardGroup;
-
-  @ManyToOne(() => User)
-  @JoinColumn({ name: 'created_by_id' })
-  createdBy: User;
-
-  @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: 'assignee_id' })
-  assignee?: User;
+  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
+  deletedAt?: Date;
 }
-
-// Aliases for backward compatibility
-export const Task = BoardItem;
-export const TaskStatus = ItemStatus;
-export const TaskPriority = ItemPriority;

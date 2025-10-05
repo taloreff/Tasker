@@ -1,54 +1,51 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column as DBColumn,
+  Column,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
   OneToMany,
   JoinColumn,
-  Index
+  Index,
 } from 'typeorm';
 import { Board } from '../../board/entities/board.entity';
+import { Task } from '../../task/entities/task.entity';
 
 export enum GroupType {
   STATUS = 'status',
   PRIORITY = 'priority',
   CATEGORY = 'category',
-  CUSTOM = 'custom'
+  CUSTOM = 'custom',
 }
 
-@Entity({ name: 'board_groups' })
+@Entity({ name: 'groups' })
 @Index(['boardId', 'position'])
-export class BoardGroup {
+export class Group {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @DBColumn({ length: 100 })
+  @Column({ length: 100 })
   name: string;
 
-  @DBColumn({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @DBColumn({
-    type: 'enum',
-    enum: GroupType,
-    default: GroupType.STATUS
-  })
+  @Column({ type: 'enum', enum: GroupType, default: GroupType.STATUS })
   groupType: GroupType;
 
-  @DBColumn({ length: 7, nullable: true })
+  @Column({ length: 7, nullable: true })
   color?: string;
 
-  @DBColumn({ name: 'board_id' })
+  @Column({ name: 'board_id' })
   @Index()
   boardId: string;
 
-  @DBColumn({ type: 'int', default: 0 })
+  @Column({ type: 'int', default: 0 })
   position: number;
 
-  @DBColumn({ name: 'is_collapsed', type: 'boolean', default: false })
+  @Column({ name: 'is_collapsed', type: 'boolean', default: false })
   isCollapsed: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -60,13 +57,10 @@ export class BoardGroup {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt?: Date;
 
-  // Relationships
-  @ManyToOne(() => Board, { eager: false })
+  @ManyToOne(() => Board, (board) => board.groups, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'board_id' })
   board: Board;
 
-  @OneToMany('BoardItem', 'group')
-  items: object[];
+  @OneToMany(() => Task, (task) => task.group)
+  tasks: Task[];
 }
-
-export const Column = BoardGroup;

@@ -32,7 +32,6 @@ export class AuthService {
     }
 
     this.logger.log(`User validation successful: ${user.email}`);
-    // Strip passwordHash before returning
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...result } = user;
     return result;
@@ -44,7 +43,6 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
     this.logger.log(`JWT token generated successfully for user: ${user.email}`);
     
-    // Return format expected by frontend
     return {
       access_token: token,
       user: {
@@ -61,16 +59,13 @@ export class AuthService {
   async register(createUserDto: CreateUserDto) {
     this.logger.log(`Registering new user: ${createUserDto.email}`);
     
-    // Create the user using UserService
     const newUser = await this.userService.create(createUserDto);
     
-    // Generate JWT token
     const payload = { sub: newUser.id, email: newUser.email };
     const token = this.jwtService.sign(payload);
     
     this.logger.log(`User registered successfully: ${newUser.email}`);
     
-    // Return format expected by frontend
     return {
       access_token: token,
       user: {
@@ -92,7 +87,6 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
 
-    // Return user without password hash
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...userProfile } = user;
     return userProfile;

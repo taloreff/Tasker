@@ -46,7 +46,6 @@ export class WorkspaceSettings {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  // Relations
   @ManyToOne(() => Workspace, { eager: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'workspaceId' })
   workspace: Workspace;

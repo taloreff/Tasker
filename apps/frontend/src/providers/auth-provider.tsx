@@ -48,7 +48,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     if (error && token) {
-      console.log('User profile fetch failed, clearing token');
       Cookies.remove('access_token');
       setToken(null);
       queryClient.removeQueries({ queryKey: ['user', 'profile'] });
@@ -88,7 +87,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     await loginMutation.mutateAsync(credentials);
   };
 
-  // Register function
   const register = async (credentials: RegisterCredentials): Promise<void> => {
     await registerMutation.mutateAsync(credentials);
   };

@@ -15,5 +15,5 @@ export class CreateCommentDto {
 
   @IsUUID()
   @IsOptional()
-  parentCommentId?: string; // For replies
+  parentCommentId?: string;
 }

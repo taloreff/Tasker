@@ -31,13 +31,11 @@ export class TeamService {
   async create(createTeamDto: CreateTeamDto, userId: string): Promise<Team> {
     this.logger.log(`Creating team: ${createTeamDto.name} in workspace: ${createTeamDto.workspaceId} by user: ${userId}`);
     
-    // Verify user has access to workspace
     await this.workspaceService.findOne(createTeamDto.workspaceId, userId);
 
     const team = this.teamRepo.create(createTeamDto);
     const savedTeam = await this.teamRepo.save(team);
 
-    // Add creator as team admin
     await this.addMember(savedTeam.id, { userId, role: TeamRole.TEAM_ADMIN }, userId);
 
     this.logger.log(`Team created: ${savedTeam.id}`);
@@ -47,7 +45,6 @@ export class TeamService {
   async findAllByWorkspace(workspaceId: string, userId: string): Promise<Team[]> {
     this.logger.log(`Finding teams in workspace: ${workspaceId} for user: ${userId}`);
     
-    // Verify user has access to workspace
     await this.workspaceService.findOne(workspaceId, userId);
 
     const teams = await this.teamRepo.find({
@@ -72,7 +69,6 @@ export class TeamService {
       throw new NotFoundException(`Team ${id} not found`);
     }
 
-    // Check if user has access to the workspace
     await this.workspaceService.findOne(team.workspaceId, userId);
 
     this.logger.log(`Team found: ${team.name} (ID: ${team.id})`);
@@ -84,7 +80,6 @@ export class TeamService {
     
     const team = await this.findOne(id, userId);
     
-    // Check if user is team admin or workspace owner
     await this.checkTeamAdminAccess(id, userId);
 
     Object.assign(team, updateTeamDto);
@@ -99,7 +94,6 @@ export class TeamService {
     
     const team = await this.findOne(id, userId);
     
-    // Check if user is team admin or workspace owner
     await this.checkTeamAdminAccess(id, userId);
     
     await this.teamRepo.softDelete(id);
@@ -111,14 +105,10 @@ export class TeamService {
     
     const team = await this.findOne(teamId, requesterId);
     
-    // Check if requester is team admin or workspace owner
     await this.checkTeamAdminAccess(teamId, requesterId);
 
-    // Verify the user exists
     await this.userService.findOne(addMemberDto.userId);
 
-    // IMPORTANT: Verify that the user is a member of the workspace first
-    // Users must be workspace members before they can join teams
     try {
       await this.workspaceService.findOne(team.workspaceId, addMemberDto.userId);
     } catch (error) {
@@ -126,7 +116,6 @@ export class TeamService {
       throw new BadRequestException('User must be a workspace member before joining a team');
     }
 
-    // Check if user is already a member
     const existingMembership = await this.userTeamRoleRepo.findOne({
       where: { teamId, userId: addMemberDto.userId },
     });
@@ -153,7 +142,6 @@ export class TeamService {
     
     await this.findOne(teamId, requesterId);
     
-    // Check if requester is team admin or workspace owner (or removing themselves)
     if (userId !== requesterId) {
       await this.checkTeamAdminAccess(teamId, requesterId);
     }
@@ -188,13 +176,11 @@ export class TeamService {
   private async checkTeamAdminAccess(teamId: string, userId: string): Promise<void> {
     const team = await this.findOne(teamId, userId);
     
-    // Check if user is workspace owner
     const workspace = await this.workspaceService.findOne(team.workspaceId, userId);
     if (workspace.ownerId === userId) {
-      return; // Workspace owner has access
+      return;
     }
 
-    // Check if user is team admin
     const membership = await this.userTeamRoleRepo.findOne({
       where: { teamId, userId, role: TeamRole.TEAM_ADMIN },
     });

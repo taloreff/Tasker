@@ -33,16 +33,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { CreateTeamModal } from './create-team-modal';
-
-interface Team {
-  id: string;
-  name: string;
-  description?: string;
-  workspaceId: string;
-  memberCount?: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Team } from '@/types';
 
 interface TeamListProps {
   workspaceId: string;

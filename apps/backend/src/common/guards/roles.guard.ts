@@ -26,7 +26,7 @@ import { ROLES_KEY } from '../decorators/roles.decorator';
       
       if (!requiredRoles) {
         this.logger.log('No roles required, allowing access');
-        return true; // no roles required
+        return true;
       }
   
       const { user } = context.switchToHttp().getRequest();

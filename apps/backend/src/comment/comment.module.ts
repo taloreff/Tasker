@@ -4,7 +4,6 @@ import { Comment } from './entities/comment.entity';
 import { CommentService } from './comment.service';
 import { CommentController } from './comment.controller';
 import { TaskModule } from '../task/task.module';
-import { ProjectModule } from '../project/project.module';
 import { BoardModule } from '../board/board.module';
 import { SubtaskModule } from '../subtask/subtask.module';
 
@@ -12,7 +11,6 @@ import { SubtaskModule } from '../subtask/subtask.module';
   imports: [
     TypeOrmModule.forFeature([Comment]),
     forwardRef(() => TaskModule),
-    forwardRef(() => ProjectModule),
     forwardRef(() => BoardModule),
     forwardRef(() => SubtaskModule),
   ],

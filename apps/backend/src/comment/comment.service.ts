@@ -11,7 +11,6 @@ import { Comment, CommentableType } from './entities/comment.entity';
 import { CreateCommentDto } from './dtos/create-comment.dto';
 import { UpdateCommentDto } from './dtos/update-comment.dto';
 import { TaskService } from '../task/task.service';
-import { ProjectService } from '../project/project.service';
 import { BoardService } from '../board/board.service';
 import { SubtaskService } from '../subtask/subtask.service';
 import { QueryCommentDto } from './dtos/query-comment.dto';
@@ -24,7 +23,6 @@ export class CommentService {
     @InjectRepository(Comment)
     private readonly commentRepo: Repository<Comment>,
     private readonly taskService: TaskService,
-    private readonly projectService: ProjectService,
     private readonly boardService: BoardService,
     private readonly subtaskService: SubtaskService,
   ) {}
@@ -32,18 +30,15 @@ export class CommentService {
   async create(createCommentDto: CreateCommentDto, userId: string): Promise<Comment> {
     this.logger.log(`Creating comment on ${createCommentDto.commentableType}: ${createCommentDto.commentableId} by user: ${userId}`);
     
-    // Validate access to the commentable entity
     await this.validateCommentableAccess(
       createCommentDto.commentableType, 
       createCommentDto.commentableId, 
       userId
     );
 
-    // Validate parent comment if replying
     if (createCommentDto.parentCommentId) {
       const parentComment = await this.findOne(createCommentDto.parentCommentId, userId);
       
-      // Ensure reply is on the same entity
       if (parentComment.commentableType !== createCommentDto.commentableType || 
           parentComment.commentableId !== createCommentDto.commentableId) {
         throw new BadRequestException('Reply must be on the same entity as parent comment');
@@ -64,7 +59,6 @@ export class CommentService {
   async findByEntity(queryDto: QueryCommentDto, userId: string): Promise<Comment[]> {
     this.logger.log(`Finding comments for ${queryDto.commentableType}: ${queryDto.commentableId}`);
     
-    // Validate access to the commentable entity
     await this.validateCommentableAccess(queryDto.commentableType, queryDto.commentableId, userId);
 
     const queryBuilder = this.commentRepo
@@ -73,20 +67,16 @@ export class CommentService {
       .where('comment.commentableType = :type', { type: queryDto.commentableType })
       .andWhere('comment.commentableId = :id', { id: queryDto.commentableId });
 
-    // Filter by parent comment if specified
     if (queryDto.parentCommentId !== undefined) {
       if (queryDto.parentCommentId === null) {
-        // Get top-level comments only
         queryBuilder.andWhere('comment.parentCommentId IS NULL');
       } else {
-        // Get replies to specific comment
         queryBuilder.andWhere('comment.parentCommentId = :parentId', { 
           parentId: queryDto.parentCommentId 
         });
       }
     }
 
-    // Include replies if requested
     if (queryDto.includeReplies) {
       queryBuilder.leftJoinAndSelect('comment.replies', 'replies')
                   .leftJoinAndSelect('replies.author', 'replyAuthor');
@@ -114,7 +104,6 @@ export class CommentService {
       throw new NotFoundException(`Comment ${id} not found`);
     }
 
-    // Validate access to the commentable entity
     await this.validateCommentableAccess(comment.commentableType, comment.commentableId, userId);
 
     this.logger.log(`Comment found: ${comment.id}`);
@@ -126,7 +115,6 @@ export class CommentService {
     
     const comment = await this.findOne(id, userId);
 
-    // Only author can edit their comment
     if (comment.authorId !== userId) {
       throw new ForbiddenException('You can only edit your own comments');
     }
@@ -145,7 +133,6 @@ export class CommentService {
     
     const comment = await this.findOne(id, userId);
 
-    // Only author can delete their comment (or you could add admin logic here)
     if (comment.authorId !== userId) {
       throw new ForbiddenException('You can only delete your own comments');
     }
@@ -174,7 +161,6 @@ export class CommentService {
   }> {
     this.logger.log(`Getting comment stats for ${commentableType}: ${commentableId}`);
     
-    // Validate access
     await this.validateCommentableAccess(commentableType, commentableId, userId);
 
     const [totalComments, topLevelComments] = await Promise.all([
@@ -200,9 +186,6 @@ export class CommentService {
       switch (commentableType) {
         case CommentableType.TASK:
           await this.taskService.findOne(commentableId, userId);
-          break;
-        case CommentableType.PROJECT:
-          await this.projectService.findOne(commentableId, userId);
           break;
         case CommentableType.BOARD:
           await this.boardService.findOne(commentableId, userId);

@@ -1,16 +1,11 @@
-import { IsUUID, IsInt, Min, IsOptional } from 'class-validator';
+import { IsUUID, IsNumber, IsOptional, Min } from 'class-validator';
 
 export class MoveTaskDto {
   @IsUUID()
-  groupId: string;
+  @IsOptional()
+  groupId?: string;
 
-  @IsInt()
+  @IsNumber()
   @Min(0)
-  @IsOptional()
-  position?: number = 0;
-
-  // Backward compatibility
-  @IsUUID()
-  @IsOptional()
-  columnId?: string;
+  position: number;
 }

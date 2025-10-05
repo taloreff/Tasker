@@ -1,11 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import { usePathname } from 'next/navigation';
-import { LogOut, Users, type LucideIcon } from 'lucide-react';
+import { usePathname, useParams } from 'next/navigation';
+import { LogOut, Users, type LucideIcon, BarChart3, Settings, Grid3X3 } from 'lucide-react';
 import {
   LayoutDashboard,
-  Folder,
   CheckSquare,
   Tag,
   Home,
@@ -27,6 +26,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/providers/auth-provider';
+import { useGetWorkspaceByIdQuery } from '@/hooks/use-workspace';
 
 interface NavItem {
   title: string;
@@ -35,59 +35,69 @@ interface NavItem {
   isActive?: boolean;
 }
 
-const data: {
-  navMain: NavItem[];
-  navWork: NavItem[];
-} = {
-  navMain: [
-    {
-      title: 'Dashboard',
-      url: '/dashboard',
-      icon: LayoutDashboard,
-      isActive: true,
-    },
-
-    {
-      title: 'Workspaces',
-      url: '/workspaces',
-      icon: Briefcase,
-    },
-  ],
-
-  navWork: [
-    {
-      title: 'My Tasks',
-      url: '/tasks',
-      icon: CheckSquare,
-    },
-    {
-      title: 'Teams',
-      url: '/teams',
-      icon: Users,
-    },
-    {
-      title: 'Projects',
-      url: '/projects',
-      icon: Folder,
-    },
-    {
-      title: 'Labels',
-      url: '/labels',
-      icon: Tag,
-    },
-  ],
-};
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const params = useParams();
   const { logout } = useAuth();
   const { open: isOpen } = useSidebar();
+  
+  const workspaceId = params?.id as string;
+  const { data: workspace } = useGetWorkspaceByIdQuery(workspaceId);
 
   const isActive = (url: string) => {
     if (url === '/dashboard' && pathname === '/dashboard') return true;
     if (url !== '/dashboard' && pathname.startsWith(url)) return true;
     return false;
   };
+
+  const mainNavItems: NavItem[] = [
+    {
+      title: 'Dashboard',
+      url: '/dashboard',
+      icon: LayoutDashboard,
+    },
+    {
+      title: 'Workspaces',
+      url: '/workspaces',
+      icon: Briefcase,
+    },
+  ];
+
+  const workspaceNavItems: NavItem[] = workspaceId ? [
+    {
+      title: 'Boards',
+      url: `/workspaces/${workspaceId}`,
+      icon: Grid3X3,
+    },
+    {
+      title: 'Analytics',
+      url: `/workspaces/${workspaceId}/dashboard`,
+      icon: BarChart3,
+    },
+    {
+      title: 'Teams',
+      url: `/workspaces/${workspaceId}/teams`,
+      icon: Users,
+    },
+    {
+      title: 'Settings',
+      url: `/workspaces/${workspaceId}/settings`,
+      icon: Settings,
+    },
+  ] : [];
+
+  const globalNavItems: NavItem[] = [
+    {
+      title: 'My Items',
+      url: '/my-items',
+      icon: CheckSquare,
+    },
+    {
+      title: 'Labels',
+      url: '/labels',
+      icon: Tag,
+    },
+  ];
 
   return (
     <Sidebar variant="inset" collapsible="icon" {...props}>
@@ -110,10 +120,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent>
+        {/* Main Navigation */}
         <SidebarGroup>
           <SidebarGroupLabel>Overview</SidebarGroupLabel>
           <SidebarMenu>
-            {data.navMain.map((item) => (
+            {mainNavItems.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   tooltip={item.title}
@@ -130,10 +141,36 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenu>
         </SidebarGroup>
 
+        {/* Workspace-specific navigation */}
+        {workspaceId && workspace && (
+          <SidebarGroup>
+            <SidebarGroupLabel>
+              {workspace.name}
+            </SidebarGroupLabel>
+            <SidebarMenu>
+              {workspaceNavItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    asChild
+                    isActive={isActive(item.url)}
+                  >
+                    <a href={item.url}>
+                      {item.icon && <item.icon />}
+                      <span>{item.title}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
+
+        {/* Global navigation */}
         <SidebarGroup>
-          <SidebarGroupLabel>Organization</SidebarGroupLabel>
+          <SidebarGroupLabel>Personal</SidebarGroupLabel>
           <SidebarMenu>
-            {data.navWork.map((item) => (
+            {globalNavItems.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   tooltip={item.title}

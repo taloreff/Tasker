@@ -21,7 +21,6 @@ export class WorkspaceBusinessLogicService {
     try {
       const workspace = await this.workspaceService.findOne(workspaceId, userId);
       
-      // If a specific role is required, check the user's role
       if (requiredRole) {
         const member = await this.workspaceService.getWorkspaceMember(workspaceId, userId);
         

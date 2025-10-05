@@ -26,7 +26,6 @@ export class CreateSubtaskDto {
   @IsOptional()
   position?: number = 0;
 
-  // Backward compatibility
   @IsString()
   @IsOptional()
   title?: string;

@@ -24,7 +24,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
         status = exception.getStatus();
         message = res;
       } else if (typeof res === 'object' && res !== null) {
-        // Most NestJS exceptions return { statusCode, message, ... }
         const obj = res as any;
         status = obj.statusCode ?? exception.getStatus();
         message = obj.message ?? exception.message;
@@ -33,7 +32,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
         message = exception.message;
       }
 
-      // Log HTTP exceptions (client errors)
       if (status >= 400) {
         this.logger.error(`HTTP ${status}: ${message} - Path: ${request?.url}`);
       } else if (exception instanceof Error) {

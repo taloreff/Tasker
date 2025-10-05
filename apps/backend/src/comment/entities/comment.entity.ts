@@ -16,7 +16,7 @@ export enum CommentableType {
   TASK = 'TASK',
   PROJECT = 'PROJECT', 
   BOARD = 'BOARD',
-  SUBTASK = 'SUBTASK', // Future
+  SUBTASK = 'SUBTASK',
 }
 
 @Entity({ name: 'comments' })
@@ -41,7 +41,7 @@ export class Comment {
 
   @Column({ name: 'parent_comment_id', nullable: true })
   @Index()
-  parentCommentId?: string; // For reply threading
+  parentCommentId?: string;
 
   @Column({ name: 'is_edited', default: false })
   isEdited: boolean;
@@ -55,7 +55,6 @@ export class Comment {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt?: Date;
 
-  // Relations
   @ManyToOne(() => User, { eager: false })
   @JoinColumn({ name: 'author_id' })
   author: User;
