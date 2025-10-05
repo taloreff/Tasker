@@ -18,9 +18,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useCreateBoardMutation } from '@/hooks/use-board';
+import { ColorPicker } from '@/components/ui/color-picker';
 import { colorOptions } from '@/lib/consts';
 import { boardSchema } from '@/lib/schemas';
-import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
@@ -124,20 +124,12 @@ export const CreateBoardModal = ({
                   <FormItem>
                     <FormLabel>Board Color</FormLabel>
                     <FormControl>
-                      <div className="flex gap-3 flex-wrap">
-                        {colorOptions.map((color) => (
-                          <div
-                            key={color}
-                            onClick={() => field.onChange(color)}
-                            className={cn(
-                              'size-6 rounded-full cursor-pointer hover:opacity-80 transition-all duration-300',
-                              field.value === color &&
-                                'ring-2 ring-offset-2 ring-blue-500'
-                            )}
-                            style={{ backgroundColor: color }}
-                          />
-                        ))}
-                      </div>
+                      <ColorPicker 
+                        value={field.value}
+                        onChange={field.onChange}
+                        size="sm"
+                        variant="ring"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

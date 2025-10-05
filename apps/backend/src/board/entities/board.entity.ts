@@ -8,11 +8,13 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
-  Index,
+  Index
 } from 'typeorm';
 import { Workspace } from '../../workspace/entities/workspace.entity';
 import { User } from '../../user/entities/user.entity';
 import { Team } from '../../team/entities/team.entity';
+import { Task } from '../../task/entities/task.entity';
+import { Group } from '../../group/entities/group.entity';
 
 @Entity({ name: 'boards' })
 @Index(['workspaceId', 'name'])
@@ -51,7 +53,6 @@ export class Board {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt?: Date;
 
-  // Relationships
   @ManyToOne(() => Workspace, { eager: false })
   @JoinColumn({ name: 'workspace_id' })
   workspace: Workspace;
@@ -64,9 +65,18 @@ export class Board {
   @JoinColumn({ name: 'assigned_team_id' })
   assignedTeam?: Team;
 
-  @OneToMany('BoardGroup', 'board')
-  groups: object[];
+  @OneToMany(
+    () => Task,
+    task => task.board
+  )
+  tasks: Task[];
 
-  @OneToMany('BoardView', 'board')
-  views: object[];
+  @OneToMany(
+    () => Group,
+    group => group.board,
+    {
+      cascade: true
+    }
+  )
+  groups: Group[];
 }

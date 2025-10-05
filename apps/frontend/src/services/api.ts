@@ -14,7 +14,6 @@ class ApiClient {
       },
     });
 
-    // Request interceptor to add auth token
     this.client.interceptors.request.use(
       (config) => {
         const token = Cookies.get('access_token');
@@ -28,7 +27,6 @@ class ApiClient {
       }
     );
 
-    // Response interceptor to handle auth errors
     this.client.interceptors.response.use(
       (response) => response,
       (error) => {

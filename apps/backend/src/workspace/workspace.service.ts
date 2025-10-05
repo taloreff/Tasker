@@ -27,7 +27,6 @@ export class WorkspaceService {
 
     const savedWorkspace = await this.workspaceRepo.save(workspace);
     
-    // Automatically add the creator as an owner member
     const ownerMember = this.workspaceMemberRepo.create({
       workspaceId: savedWorkspace.id,
       userId: ownerId,
@@ -45,7 +44,6 @@ export class WorkspaceService {
   async findUserWorkspaces(userId: string): Promise<Workspace[]> {
     this.logger.log(`Finding workspaces for user: ${userId}`);
     
-    // Find workspaces where the user is a member
     const membershipQuery = this.workspaceMemberRepo
       .createQueryBuilder('wm')
       .leftJoinAndSelect('wm.workspace', 'workspace')
@@ -73,7 +71,6 @@ export class WorkspaceService {
       throw new NotFoundException(`Workspace ${id} not found`);
     }
 
-    // Check if user has access through membership
     const hasAccess = workspace.members.some(
       member => member.userId === userId && member.isActive
     );
@@ -90,8 +87,7 @@ export class WorkspaceService {
   async update(id: string, updateWorkspaceDto: UpdateWorkspaceDto, userId: string): Promise<Workspace> {
     this.logger.log(`Updating workspace: ${id} by user: ${userId}`);
     
-    const workspace = await this.findOne(id, userId); // This checks access
-
+    const workspace = await this.findOne(id, userId);
     Object.assign(workspace, updateWorkspaceDto);
     const updatedWorkspace = await this.workspaceRepo.save(workspace);
     
@@ -102,7 +98,7 @@ export class WorkspaceService {
   async remove(id: string, userId: string): Promise<void> {
     this.logger.log(`Soft deleting workspace: ${id} by user: ${userId}`);
     
-    await this.findOne(id, userId); // This checks access
+    await this.findOne(id, userId);
     
     await this.workspaceRepo.softDelete(id);
     this.logger.log(`Workspace soft deleted: ${id}`);
@@ -119,7 +115,6 @@ export class WorkspaceService {
       if (existingMember.isActive) {
         throw new ForbiddenException('User is already a member of this workspace');
       }
-      // Reactivate existing member
       existingMember.isActive = true;
       existingMember.role = role;
       existingMember.joinedAt = new Date();
@@ -139,7 +134,6 @@ export class WorkspaceService {
   async removeMember(workspaceId: string, userId: string, requesterId: string): Promise<void> {
     this.logger.log(`Removing member ${userId} from workspace ${workspaceId} by ${requesterId}`);
     
-    // Check if requester has permission (must be owner or admin)
     const requesterMembership = await this.workspaceMemberRepo.findOne({
       where: { workspaceId, userId: requesterId },
     });
@@ -156,7 +150,6 @@ export class WorkspaceService {
       throw new NotFoundException('Member not found in workspace');
     }
 
-    // Soft delete by setting isActive to false
     member.isActive = false;
     await this.workspaceMemberRepo.save(member);
   }

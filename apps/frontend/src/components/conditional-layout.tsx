@@ -11,7 +11,6 @@ interface ConditionalLayoutProps {
 export default function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname();
   
-  // Don't show sidebar on homepage and auth pages
   const shouldShowSidebar = pathname !== '/' && !pathname.startsWith('/auth');
 
   if (!shouldShowSidebar) {

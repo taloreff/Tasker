@@ -4,17 +4,16 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  DeleteDateColumn,
   ManyToOne,
   JoinColumn,
   Index,
 } from 'typeorm';
-import { BoardItem } from '../../task/entities/task.entity';
+import { Task } from '../../task/entities/task.entity';
 import { User } from '../../user/entities/user.entity';
 
-@Entity({ name: 'board_subitems' })
+@Entity({ name: 'subtask' })
 @Index(['itemId', 'position'])
-export class BoardSubitem {
+export class Subtask {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -45,9 +44,9 @@ export class BoardSubitem {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @ManyToOne(() => BoardItem)
+  @ManyToOne(() => Task)
   @JoinColumn({ name: 'item_id' })
-  item: BoardItem;
+  item: Task;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'created_by_id' })
@@ -57,6 +56,3 @@ export class BoardSubitem {
   @JoinColumn({ name: 'assignee_id' })
   assignee?: User;
 }
-
-// Alias for backward compatibility
-export const Subtask = BoardSubitem;

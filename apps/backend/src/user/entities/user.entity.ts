@@ -59,7 +59,6 @@ export class User {
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
-    // Only hash if it's a plain text password (doesn't start with bcrypt hash prefix)
     if (this.passwordHash && !this.passwordHash.startsWith('$2b$')) {
       this.passwordHash = await bcrypt.hash(this.passwordHash, 10);
     }

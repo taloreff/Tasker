@@ -12,7 +12,6 @@ import {
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Team } from '../../team/entities/team.entity';
-import { Project } from '../../project/entities/project.entity';
 import { WorkspaceMember } from '../../user/entities/workspace-member.entity';
 import { WorkspaceSettings } from './workspace-settings.entity';
 import { ActivityLog } from './activity-log.entity';
@@ -46,16 +45,12 @@ export class Workspace {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt?: Date;
 
-  // Relations
   @ManyToOne(() => User, { eager: false })
   @JoinColumn({ name: 'owner_id' })
   owner: User;
 
   @OneToMany(() => Team, (team) => team.workspace)
   teams: Team[];
-
-  @OneToMany(() => Project, (project) => project.workspace)
-  projects: Project[];
 
   @OneToMany(() => WorkspaceMember, (member) => member.workspace)
   members: WorkspaceMember[];

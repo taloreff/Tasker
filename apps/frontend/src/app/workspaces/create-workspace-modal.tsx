@@ -16,9 +16,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useCreateWorkspace } from '@/hooks/use-workspace';
+import { ColorPicker } from '@/components/ui/color-picker';
 import { colorOptions } from '@/lib/consts';
 import { workspaceSchema } from '@/lib/schemas';
-import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { useRouter } from 'next/navigation';
@@ -57,8 +57,14 @@ export const CreateWorkspaceModal = ({
         toast.success('Workspace created successfully');
         router.replace(`/workspaces/${data.id}`);
       },
-      onError: (error: any) => {
-        const errorMessage = error.response.data.message;
+      onError: (error: unknown) => {
+        let errorMessage = 'Failed to create workspace';
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        } else if (typeof error === 'object' && error !== null) {
+          const apiError = error as { response?: { data?: { message?: string } } };
+          errorMessage = apiError.response?.data?.message || errorMessage;
+        }
         toast.error(errorMessage);
         console.log(error);
       },
@@ -109,20 +115,12 @@ export const CreateWorkspaceModal = ({
                   <FormItem>
                     <FormLabel>Workspace Color</FormLabel>
                     <FormControl>
-                      <div className="flex gap-3 flex-wrap">
-                        {colorOptions.map((color) => (
-                          <div
-                            key={color}
-                            onClick={() => field.onChange(color)}
-                            className={cn(
-                              'size-6 rounded-full cursor-pointer hover:opacity-80 transition-all duration-300',
-                              field.value === color &&
-                                'ring-2 ring-offset-2 ring-blue-500'
-                            )}
-                            style={{ backgroundColor: color }}
-                          ></div>
-                        ))}
-                      </div>
+                      <ColorPicker 
+                        value={field.value}
+                        onChange={field.onChange}
+                        size="sm"
+                        variant="ring"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

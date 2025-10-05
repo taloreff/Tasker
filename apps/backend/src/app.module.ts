@@ -6,13 +6,12 @@ import { AuthModule } from './auth/auth.module';
 import { WorkspaceModule } from './workspace/workspace.module';
 import { LoggerModule } from 'nestjs-pino';
 import { TeamModule } from './team/team.module';
-import { ProjectModule } from './project/project.module';
 import { BoardModule } from './board/board.module';
-import { ColumnModule } from './column/column.module';
 import { TaskModule } from './task/task.module';
 import { SubtaskModule } from './subtask/subtask.module';
 import { LabelModule } from './label/label.module';
 import { CommentModule } from './comment/comment.module';
+import { GroupModule } from './group/group.module';
 
 @Module({
   imports: [
@@ -29,9 +28,8 @@ import { CommentModule } from './comment/comment.module';
     AuthModule,
     WorkspaceModule,
     TeamModule,
-    ProjectModule,
     BoardModule,
-    ColumnModule,
+    GroupModule,
     TaskModule,
     SubtaskModule,
     LabelModule,

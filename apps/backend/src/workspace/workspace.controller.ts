@@ -76,7 +76,6 @@ export class WorkspaceController {
     return this.workspaceService.removeMember(workspaceId, userId, req.user.id);
   }
 
-  // Team routes nested under workspace
   @Get(':id/teams')
   getWorkspaceTeams(@Param('id') workspaceId: string, @Request() req) {
     return this.teamService.findAllByWorkspace(workspaceId, req.user.id);
@@ -88,7 +87,6 @@ export class WorkspaceController {
     @Body() createWorkspaceTeamDto: CreateWorkspaceTeamDto,
     @Request() req,
   ) {
-    // Create the full team DTO with workspaceId from URL parameter
     const createTeamDto: CreateTeamDto = {
       ...createWorkspaceTeamDto,
       workspaceId,

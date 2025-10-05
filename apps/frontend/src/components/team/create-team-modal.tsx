@@ -25,15 +25,9 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { useCreateTeamMutation } from '@/hooks/use-team';
 import { teamSchema } from '@/lib/schemas';
+import { Team } from '@/types';
 
-interface Team {
-  id: string;
-  name: string;
-  description?: string;
-  workspaceId: string;
-  createdAt: string;
-  updatedAt: string;
-}
+
 
 export type TeamForm = z.infer<typeof teamSchema>;
 
@@ -64,15 +58,12 @@ export function CreateTeamModal({
     try {
       const team = await createTeamMutation.mutateAsync(values);
 
-      // Reset form and close modal
       form.reset();
       onOpenChange(false);
 
-      // Notify parent component
       onTeamCreated?.(team);
     } catch (error) {
       console.error('Error creating team:', error);
-      // TODO: Add proper error handling with toast
     }
   };
 

@@ -22,13 +22,10 @@ export default function HomePage() {
   useEffect(() => {
     setMounted(true);
 
-    // Check if user is already logged in without making API calls
     const token = Cookies.get('access_token');
     if (token) {
-      // If there's a token, redirect to dashboard
       router.push('/dashboard');
     } else {
-      // No token, show landing page
       setIsCheckingAuth(false);
     }
   }, [router]);

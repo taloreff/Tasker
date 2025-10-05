@@ -5,7 +5,6 @@ import { usePathname, useParams } from 'next/navigation';
 import { LogOut, Users, type LucideIcon, BarChart3, Settings, Grid3X3 } from 'lucide-react';
 import {
   LayoutDashboard,
-  Folder,
   CheckSquare,
   Tag,
   Home,
@@ -51,7 +50,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return false;
   };
 
-  // Main navigation items
   const mainNavItems: NavItem[] = [
     {
       title: 'Dashboard',
@@ -65,7 +63,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
   ];
 
-  // Workspace-specific navigation (only show when in a workspace)
   const workspaceNavItems: NavItem[] = workspaceId ? [
     {
       title: 'Boards',
@@ -89,7 +86,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
   ] : [];
 
-  // Global items
   const globalNavItems: NavItem[] = [
     {
       title: 'My Items',

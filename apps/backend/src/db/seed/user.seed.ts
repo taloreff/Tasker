@@ -10,7 +10,6 @@ async function run() {
   const userRepo = dataSource.getRepository(User);
   const roleRepo = dataSource.getRepository(Role);
 
-  // --- Seed roles ---
   const roles = ['ADMIN', 'USER'];
   const roleEntities = roles.map(roleFactory);
   await roleRepo.upsert(roleEntities, ['name']);
@@ -18,8 +17,6 @@ async function run() {
   const adminRole = await roleRepo.findOneBy({ name: 'ADMIN' });
   const userRole = await roleRepo.findOneBy({ name: 'USER' });
 
-  // --- Seed users ---
-  // Admin (only 1)
   const admin = await userFactory({
     firstName: 'Admin',
     lastName: 'User',
@@ -29,7 +26,6 @@ async function run() {
   admin.roles = [adminRole!];
   await userRepo.save(admin);
 
-  // Test user
   const testUser = await userFactory({
     firstName: 'Test',
     lastName: 'User',
@@ -39,7 +35,6 @@ async function run() {
   testUser.roles = [userRole!];
   await userRepo.save(testUser);
 
-  // Random users (all USER)
   const randomUsers = await Promise.all(
     Array.from({ length: 10 }, () => userFactory())
   );

@@ -35,8 +35,8 @@ export enum ActivityEntityType {
 }
 
 @Entity({ name: 'activity_logs' })
-@Index(['workspaceId', 'createdAt']) // For workspace activity feeds
-@Index(['entityType', 'entityId']) // For entity-specific activity
+@Index(['workspaceId', 'createdAt']) 
+@Index(['entityType', 'entityId']) 
 export class ActivityLog {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -69,15 +69,14 @@ export class ActivityLog {
   action: ActivityAction;
 
   @Column({ type: 'json', nullable: true })
-  changes?: Record<string, unknown>; // Store before/after values for updates
+  changes?: Record<string, unknown>; 
 
   @Column({ type: 'json', nullable: true })
-  metadata?: Record<string, unknown>; // Additional context (IP, user agent, etc.)
+  metadata?: Record<string, unknown>; 
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  // Relations
   @ManyToOne(() => User, { eager: false })
   @JoinColumn({ name: 'user_id' })
   user: User;

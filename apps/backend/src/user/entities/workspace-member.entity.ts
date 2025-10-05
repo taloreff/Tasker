@@ -10,7 +10,7 @@ export enum WorkspaceMemberRole {
 }
 
 @Entity('workspace_members')
-@Index(['workspaceId', 'userId'], { unique: true }) // Prevent duplicate memberships
+@Index(['workspaceId', 'userId'], { unique: true })
 export class WorkspaceMember {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -31,7 +31,6 @@ export class WorkspaceMember {
   @Column({ type: 'timestamp', nullable: true })
   joinedAt: Date;
 
-  // Relationships
   @ManyToOne(() => User, user => user.workspaceMemberships, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;

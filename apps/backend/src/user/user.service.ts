@@ -1,4 +1,3 @@
-// user.service.ts
 import { BadRequestException, Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -66,7 +65,7 @@ export class UserService {
 
   async update(id: string, dto: UpdateUserDto) {
     this.logger.log(`Updating user: ${id}`);
-    await this.findOne(id); // ensure exists
+    await this.findOne(id);
     await this.userRepo.update(id, dto);
     this.logger.log(`User updated successfully: ${id}`);
     return this.findOne(id);

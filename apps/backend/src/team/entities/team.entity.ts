@@ -38,7 +38,6 @@ export class Team {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt?: Date;
 
-  // Relations
   @ManyToOne(() => Workspace, { eager: false })
   @JoinColumn({ name: 'workspace_id' })
   workspace: Workspace;

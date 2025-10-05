@@ -14,10 +14,10 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/providers/auth-provider';
 import { useGetWorkspacesQuery } from '@/hooks/use-workspace';
-import { Loader } from './loader';
 import { Workspace } from '@/types';
 import { useState } from 'react';
 import { CreateWorkspaceModal } from '@/app/workspaces/create-workspace-modal';
+import { useRouter } from 'next/navigation';
 
 interface WorkspaceSelectorProps {
   onWorkspaceSelected: (workspace: Workspace) => void;
@@ -45,7 +45,7 @@ function WorkspaceSelector({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="gap-2 px-3">
+        <Button variant="ghost" className="gap-2 px-3 ">
           <span className="font-medium">
             {selectedWorkspace?.name || 'Select Workspace'}
           </span>
@@ -87,7 +87,7 @@ function WorkspaceSelector({
 
 export function TopNavbar() {
   const { user, logout } = useAuth();
-
+  const router = useRouter();
   const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(
     null
   );
@@ -95,10 +95,11 @@ export function TopNavbar() {
 
   const handleWorkspaceSelected = (workspace: Workspace) => {
     setCurrentWorkspace(workspace);
+    router.push(`/workspaces/${workspace.id}`);
   };
 
   return (
-    <header className="border-b bg-background">
+    <header className="bg-background sticky top-0 z-50 shadow-md">
       <div className="flex h-16 items-center px-4 gap-4">
         <WorkspaceSelector
           onWorkspaceSelected={handleWorkspaceSelected}

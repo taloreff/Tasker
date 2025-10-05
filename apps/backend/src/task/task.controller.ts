@@ -8,7 +8,7 @@ import {
   Delete,
   UseGuards,
   Request,
-  Query,
+  Query
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dtos/create-task.dto';
@@ -29,12 +29,12 @@ export class TaskController {
 
   @Get()
   findAll(
-    @Query('boardId') boardId: string,
-    @Query('columnId') columnId: string,
     @Request() req,
+    @Query('boardId') boardId: string,
+    @Query('groupBy') groupBy?: 'status' | 'priority'
   ) {
-    if (columnId) {
-      return this.taskService.findAllByColumn(columnId, req.user.id);
+    if (boardId && groupBy) {
+      return this.taskService.findGroupedByBoard(boardId, groupBy, req.user.id);
     }
     if (boardId) {
       return this.taskService.findAllByBoard(boardId, req.user.id);
@@ -51,7 +51,7 @@ export class TaskController {
   update(
     @Param('id') id: string,
     @Body() updateTaskDto: UpdateTaskDto,
-    @Request() req,
+    @Request() req
   ) {
     return this.taskService.update(id, updateTaskDto, req.user.id);
   }
@@ -65,8 +65,10 @@ export class TaskController {
   moveTask(
     @Param('id') id: string,
     @Body() moveTaskDto: MoveTaskDto,
-    @Request() req,
+    @Request() req
   ) {
+    console.log('➡️ moveTask called', { id, moveTaskDto });
+
     return this.taskService.moveTask(id, moveTaskDto, req.user.id);
   }
 
@@ -74,7 +76,7 @@ export class TaskController {
   assignTask(
     @Param('id') id: string,
     @Body() assignTaskDto: AssignTaskDto,
-    @Request() req,
+    @Request() req
   ) {
     return this.taskService.assignTask(id, assignTaskDto, req.user.id);
   }

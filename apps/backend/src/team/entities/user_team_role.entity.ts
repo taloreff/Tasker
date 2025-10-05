@@ -16,7 +16,7 @@ export enum TeamRole {
 }
 
 @Entity({ name: 'user_team_roles' })
-@Index(['teamId', 'userId'], { unique: true }) // Prevent duplicate memberships
+@Index(['teamId', 'userId'], { unique: true })
 export class UserTeamRole {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -39,7 +39,6 @@ export class UserTeamRole {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  // Relations
   @ManyToOne(() => Team, { eager: false })
   @JoinColumn({ name: 'team_id' })
   team: Team;

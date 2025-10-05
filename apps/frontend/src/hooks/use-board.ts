@@ -1,17 +1,9 @@
 import { REACT_QUERY_KEYS } from '@/lib/consts';
 import { apiClient } from '@/services/api';
+import { Board } from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-export interface Board {
-  id: string;
-  name: string;
-  description?: string;
-  color: string;
-  workspaceId: string;
-  position: number;
-  createdAt: string;
-  updatedAt: string;
-}
+
 
 export interface CreateBoardDto {
   name: string;
