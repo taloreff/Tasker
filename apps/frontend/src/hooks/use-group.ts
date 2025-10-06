@@ -40,6 +40,9 @@ export const useCreateGroupMutation = (boardId: string) => {
       queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.GROUPS, boardId],
       });
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.TASKS, 'grouped', boardId],
+      });
     },
   });
 };

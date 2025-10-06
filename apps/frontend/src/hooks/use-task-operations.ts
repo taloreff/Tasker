@@ -66,7 +66,6 @@ export const useUpdateTaskPriority = () => {
 
 export const useMoveTaskPosition = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async ({
       taskId,
@@ -81,6 +80,9 @@ export const useMoveTaskPosition = () => {
     onSuccess: (_, { boardId }) => {
       queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.TASKS, 'board', boardId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.TASKS, 'group', boardId],
       });
       queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.TASKS, 'grouped', boardId],

@@ -2,8 +2,17 @@
 
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useGetWorkspaceByIdQuery } from '@/hooks/use-workspace';
-import { useGetBoardsByWorkspaceQuery } from '@/hooks/use-board';
+import {
+  useGetBoardsByWorkspaceQuery,
+  useDeleteBoardMutation,
+} from '@/hooks/use-board';
 import { useGetTeamsByWorkspaceQuery } from '@/hooks/use-team';
 import { Loader } from '@/components/loader';
 import { Button } from '@/components/ui/button';
@@ -14,14 +23,29 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Grid3X3, Plus, Users, Calendar, TrendingUp } from 'lucide-react';
+import {
+  Grid3X3,
+  Plus,
+  Users,
+  Calendar,
+  TrendingUp,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+} from 'lucide-react';
 import { CreateBoardModal } from '@/components/board/create-board-modal';
+import { Board } from '@/types';
+import { toast } from 'sonner';
+import { ConfirmDeleteBoardModal } from '@/components/board/confirm-delete-board-modal';
 
 export default function WorkspaceDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const workspaceId = params.id as string;
   const [isCreateBoardModalOpen, setIsCreateBoardModalOpen] = useState(false);
+  const [editingBoard, setEditingBoard] = useState<Board | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [boardToDelete, setBoardToDelete] = useState<Board | null>(null);
 
   const {
     data: workspace,
@@ -32,6 +56,20 @@ export default function WorkspaceDetailsPage() {
     useGetBoardsByWorkspaceQuery(workspaceId);
   const { data: teams, isLoading: teamsLoading } =
     useGetTeamsByWorkspaceQuery(workspaceId);
+
+  const deleteBoardMutation = useDeleteBoardMutation(workspaceId);
+
+  const handleEditBoard = (board: Board) => {
+    setEditingBoard(board);
+    setIsCreateBoardModalOpen(true);
+  };
+
+  const handleDeleteBoard = (boardId: string) => {
+    deleteBoardMutation.mutate(boardId, {
+      onSuccess: () => toast.success('Board deleted successfully'),
+      onError: () => toast.error('Failed to delete board'),
+    });
+  };
 
   if (workspaceLoading) {
     return (
@@ -158,16 +196,53 @@ export default function WorkspaceDetailsPage() {
                         {board.name}
                       </CardTitle>
                     </div>
+
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="ml-auto"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditBoard(board);
+                          }}
+                        >
+                          <Pencil className="w-4 h-4 mr-2" /> Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setBoardToDelete(board);
+                            setIsDeleteModalOpen(true);
+                          }}
+                          className="text-destructive focus:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" /> Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
+
                   {board.description && (
                     <CardDescription className="text-sm text-muted-foreground line-clamp-2 ml-7 leading-relaxed">
                       {board.description}
                     </CardDescription>
                   )}
                 </CardHeader>
+
                 <CardContent className="pt-0">
                   <div className="flex items-center justify-between text-xs text-muted-foreground ml-7">
-                    <span className="font-medium">0 items</span>
+                    <span className="font-medium">
+                      {board.taskCount ?? 0} items
+                    </span>
                     <span>
                       Updated {new Date(board.updatedAt).toLocaleDateString()}
                     </span>
@@ -177,7 +252,7 @@ export default function WorkspaceDetailsPage() {
             ))}
 
             <Card
-              className=" hover:bg-muted/10 transition-all duration-200 cursor-pointer min-h-[160px]"
+              className="hover:bg-muted/10 transition-all duration-200 cursor-pointer min-h-[160px]"
               onClick={() => setIsCreateBoardModalOpen(true)}
             >
               <CardContent className="flex flex-col items-center justify-center h-full space-y-4 p-6">
@@ -202,6 +277,14 @@ export default function WorkspaceDetailsPage() {
         workspaceId={workspaceId}
         isOpen={isCreateBoardModalOpen}
         setOpen={setIsCreateBoardModalOpen}
+        boardToEdit={editingBoard}
+      />
+      <ConfirmDeleteBoardModal
+        isOpen={isDeleteModalOpen}
+        setOpen={setIsDeleteModalOpen}
+        workspaceId={workspaceId}
+        boardId={boardToDelete?.id ?? null}
+        boardName={boardToDelete?.name}
       />
     </div>
   );

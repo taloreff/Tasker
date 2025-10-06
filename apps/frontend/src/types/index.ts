@@ -70,6 +70,7 @@ export interface Board {
   name: string;
   description?: string;
   color: string;
+  taskCount: number;
   workspaceId: string;
   ownerId: string;
   assignedTeamId?: string;
@@ -114,11 +115,17 @@ export interface Task {
   id: string;
   name: string;
   description?: string;
+
   status: TaskStatus;
   priority: TaskPriority;
+
   boardId: string;
+
+  groupId?: string | null;
+
   assigneeId?: string;
   createdById: string;
+
   position: number;
   createdAt: string;
   updatedAt: string;

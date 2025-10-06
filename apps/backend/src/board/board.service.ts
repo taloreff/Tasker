@@ -1,15 +1,13 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { DeepPartial, In, Repository } from 'typeorm';
 import { Board } from './entities/board.entity';
 import { WorkspaceService } from '../workspace/workspace.service';
 import { CreateBoardDto } from './dtos/create-board.dto';
 import { UpdateBoardDto } from './dtos/update-board.dto';
 import { ReorderBoardsDto } from './dtos/reorder-board.dto';
+import { Group, GroupType } from '../group/entities/group.entity';
+import { Task } from './entities';
 
 @Injectable()
 export class BoardService {
@@ -18,6 +16,10 @@ export class BoardService {
   constructor(
     @InjectRepository(Board)
     private readonly boardRepo: Repository<Board>,
+    @InjectRepository(Group)
+    private readonly groupRepo: Repository<Group>,
+    @InjectRepository(Task)
+    private readonly taskRepo: Repository<Task>,
     private readonly workspaceService: WorkspaceService
   ) {}
 
@@ -34,12 +36,56 @@ export class BoardService {
     });
 
     const savedBoard = await this.boardRepo.save(board);
-    this.logger.log(`Board created: ${savedBoard.id}`);
+    const defaultGroups: DeepPartial<Group>[] = [
+      {
+        name: 'todo',
+        groupType: GroupType.STATUS,
+        color: '#E5E7EB',
+        boardId: savedBoard.id
+      },
+      {
+        name: 'in_progress',
+        groupType: GroupType.STATUS,
+        color: '#3B82F6',
+        boardId: savedBoard.id
+      },
+      {
+        name: 'review',
+        groupType: GroupType.STATUS,
+        color: '#F59E0B',
+        boardId: savedBoard.id
+      },
+      {
+        name: 'done',
+        groupType: GroupType.STATUS,
+        color: '#10B981',
+        boardId: savedBoard.id
+      },
+      {
+        name: 'blocked',
+        groupType: GroupType.STATUS,
+        color: '#EF4444',
+        boardId: savedBoard.id
+      },
+      {
+        name: 'cancelled',
+        groupType: GroupType.STATUS,
+        color: '#9CA3AF',
+        boardId: savedBoard.id
+      }
+    ];
+
+    await this.groupRepo.save(defaultGroups);
+
+    this.logger.log(`Board created with default groups: ${savedBoard.id}`);
 
     return this.findOne(savedBoard.id, userId);
   }
 
-  async findAllByWorkspace(workspaceId: string, userId: string): Promise<Board[]> {
+  async findAllByWorkspace(
+    workspaceId: string,
+    userId: string
+  ): Promise<(Board & { taskCount: number })[]> {
     this.logger.log(
       `Finding boards in workspace: ${workspaceId} for user: ${userId}`
     );
@@ -52,8 +98,28 @@ export class BoardService {
       order: { createdAt: 'ASC' }
     });
 
-    this.logger.log(`Found ${boards.length} boards in workspace: ${workspaceId}`);
-    return boards;
+    if (boards.length === 0) return [];
+
+    const taskCountsRaw = await this.taskRepo
+      .createQueryBuilder('task')
+      .select('task.boardId', 'boardId')
+      .addSelect('COUNT(task.id)', 'count')
+      .where('task.boardId IN (:...boardIds)', {
+        boardIds: boards.map(b => b.id)
+      })
+      .groupBy('task.boardId')
+      .getRawMany<{ boardId: string; count: string }>();
+
+    const taskCounts = new Map(
+      taskCountsRaw.map(r => [r.boardId, Number(r.count)])
+    );
+
+    const enrichedBoards = boards.map(board => ({
+      ...board,
+      taskCount: taskCounts.get(board.id) ?? 0
+    }));
+
+    return enrichedBoards;
   }
 
   async findOne(id: string, userId: string): Promise<Board> {
@@ -75,11 +141,14 @@ export class BoardService {
     return board;
   }
 
-  async update(id: string, updateBoardDto: UpdateBoardDto, userId: string): Promise<Board> {
+  async update(
+    id: string,
+    updateBoardDto: UpdateBoardDto,
+    userId: string
+  ): Promise<Board> {
     this.logger.log(`Updating board: ${id} by user: ${userId}`);
 
     const board = await this.findOne(id, userId);
-
 
     Object.assign(board, updateBoardDto);
     const updatedBoard = await this.boardRepo.save(board);
@@ -97,8 +166,14 @@ export class BoardService {
     this.logger.log(`Board soft deleted: ${id}`);
   }
 
-  async findBoardsByIds(workspaceId: string, boardIds: string[], userId: string): Promise<Board[]> {
-    this.logger.log(`Finding boards by IDs in workspace: ${workspaceId} for user: ${userId}`);
+  async findBoardsByIds(
+    workspaceId: string,
+    boardIds: string[],
+    userId: string
+  ): Promise<Board[]> {
+    this.logger.log(
+      `Finding boards by IDs in workspace: ${workspaceId} for user: ${userId}`
+    );
 
     await this.workspaceService.findOne(workspaceId, userId);
 
@@ -110,11 +185,16 @@ export class BoardService {
     return boards;
   }
 
-  async reorderBoards(workspaceId: string, reorderDto: ReorderBoardsDto, userId: string): Promise<Board[]> {
-    this.logger.log(`Reordering boards in workspace: ${workspaceId} by user: ${userId}`);
+  async reorderBoards(
+    workspaceId: string,
+    reorderDto: ReorderBoardsDto,
+    userId: string
+  ): Promise<Board[]> {
+    this.logger.log(
+      `Reordering boards in workspace: ${workspaceId} by user: ${userId}`
+    );
 
     await this.workspaceService.findOne(workspaceId, userId);
-
 
     this.logger.log(`Board reordering completed for workspace: ${workspaceId}`);
     return this.findAllByWorkspace(workspaceId, userId);
@@ -123,7 +203,9 @@ export class BoardService {
   async findUserBoards(userId: string): Promise<Board[]> {
     this.logger.log(`Finding all boards for user: ${userId}`);
 
-    const userWorkspaces = await this.workspaceService.findUserWorkspaces(userId);
+    const userWorkspaces = await this.workspaceService.findUserWorkspaces(
+      userId
+    );
     const workspaceIds = userWorkspaces.map(w => w.id);
 
     if (workspaceIds.length === 0) {

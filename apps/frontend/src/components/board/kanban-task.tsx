@@ -22,14 +22,7 @@ function animateLayoutChanges(args: any) {
 }
 
 export function KanbanTask({ task, isDragged = false }: KanbanTaskProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
     animateLayoutChanges,
   });
@@ -56,39 +49,21 @@ export function KanbanTask({ task, isDragged = false }: KanbanTaskProps) {
     >
       <CardContent className="p-3">
         <div className="flex items-start justify-between mb-2">
-          <h4 className="font-medium text-sm leading-tight flex-1 pr-2">
-            {task.name}
-          </h4>
-          {task.priority !== 'medium' && (
-            <Flag
-              className={cn(
-                'w-3 h-3 flex-shrink-0',
-                priorityColors[task.priority]
-              )}
-            />
-          )}
+          <h4 className="font-medium text-sm leading-tight flex-1 pr-2">{task.name}</h4>
+          {task.priority !== 'medium' && <Flag className={cn('w-3 h-3 flex-shrink-0', priorityColors[task.priority])} />}
         </div>
 
-        {task.description && (
-          <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
-            {task.description}
-          </p>
-        )}
+        {task.description && <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{task.description}</p>}
 
         <div className="flex items-center justify-between">
-          <Badge
-            variant="outline"
-            className={cn('text-xs', statusColors[task.status])}
-          >
+          <Badge variant="outline" className={cn('text-xs', statusColors[task.status])}>
             <StatusIcon className="w-3 h-3 mr-1" />
             {task.status.replace('_', ' ')}
           </Badge>
 
           {task.assignee && (
             <Avatar className="w-5 h-5">
-              <AvatarImage
-                src={`https://avatar.vercel.sh/${task.assignee.email}`}
-              />
+              <AvatarImage src={`https://avatar.vercel.sh/${task.assignee.email}`} />
               <AvatarFallback className="text-xs">
                 {task.assignee.firstName[0]}
                 {task.assignee.lastName[0]}

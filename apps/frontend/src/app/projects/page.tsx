@@ -19,7 +19,6 @@ export default function ProjectsPage() {
         </Button>
       </div>
       
-      {/* Empty state */}
       <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
         <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted">

@@ -46,7 +46,6 @@ export default function WorkspaceDashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">Analytics</h1>
         <p className="text-muted-foreground mt-1">
@@ -54,7 +53,6 @@ export default function WorkspaceDashboardPage() {
         </p>
       </div>
 
-      {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -109,7 +107,6 @@ export default function WorkspaceDashboardPage() {
         </Card>
       </div>
 
-      {/* Charts Section */}
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -152,7 +149,6 @@ export default function WorkspaceDashboardPage() {
         </Card>
       </div>
 
-      {/* Board Performance */}
       <Card>
         <CardHeader>
           <CardTitle>Board Performance</CardTitle>
