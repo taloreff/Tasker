@@ -1,35 +1,25 @@
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
-import {
-  DndContext,
-  DragEndEvent,
-  DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragOverlay,
-} from '@dnd-kit/core';
+import { DndContext, DragOverlay } from '@dnd-kit/core';
 import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { useDroppable } from '@dnd-kit/core';
 import { motion } from 'framer-motion';
+
 import { useGetBoardByIdQuery } from '@/hooks/use-board';
 import { useGetGroupedTasksByBoardQuery } from '@/hooks/use-grouped-tasks';
+import { useGetGroupsByBoardQuery } from '@/hooks/use-group';
 import {
-  useUpdateTaskStatus,
-  useUpdateTaskPriority,
   useMoveTaskPosition,
+  useUpdateTaskPriority,
+  useUpdateTaskStatus,
 } from '@/hooks/use-task-operations';
-import { Loader } from '@/components/loader';
+
 import { Button } from '@/components/ui/button';
-import { Plus, Settings, Filter, ArrowUpDown, Users } from 'lucide-react';
-import { KanbanTask } from '@/components/board/kanban-task';
-import { CreateGroupModal } from '@/components/board/create-group-modal';
-import { CreateTaskModal } from '@/components/board/create-task-modal';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -37,231 +27,84 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Loader } from '@/components/loader';
+import { Plus, Settings, Filter, ArrowUpDown, Users } from 'lucide-react';
+
+import { CreateGroupModal } from '@/components/board/create-group-modal';
+import { CreateTaskModal } from '@/components/board/create-task-modal';
+import { KanbanTask } from '@/components/board/kanban-task';
+import { useKanbanDnD, GroupBy } from '@/hooks/use-kanban-dnd';
+import { DroppableColumn } from '@/components/board/kanban-droppable-column';
 import { Task } from '@/types';
-
-const DroppableColumn = React.memo(function DroppableColumn({
-  columnValue,
-  children,
-}: {
-  columnValue: string;
-  children: React.ReactNode;
-}) {
-  const { setNodeRef, isOver } = useDroppable({
-    id: `column-${columnValue}`,
-  });
-
-  return (
-    <div
-      ref={setNodeRef}
-      className={`h-full flex flex-col transition-all duration-150 ${
-        isOver
-          ? 'bg-primary/5 border border-primary/20 rounded-lg shadow-inner'
-          : ''
-      }`}
-    >
-      {children}
-    </div>
-  );
-});
 
 export default function BoardDetailPage() {
   const params = useParams();
+  const boardId = params.boardId as string;
 
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
   const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
-  const [groupBy, setGroupBy] = useState<'status' | 'priority'>('status');
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const [draggedTaskData, setDraggedTaskData] = useState<Task | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
-  const [overId, setOverId] = useState<string | null>(null);
+  const [groupBy, setGroupBy] = useState<GroupBy>('status');
 
-  const overIdRef = useRef<string | null>(null);
+  const { data: board, isLoading: isBoardLoading } =
+    useGetBoardByIdQuery(boardId);
 
-  const { data: boardData, isLoading: isBoardLoading } = useGetBoardByIdQuery(
-    params.boardId as string
+  const { data: groupedTasksData, isLoading: isTasksLoadingGrouped } =
+    useGetGroupedTasksByBoardQuery(
+      boardId,
+      groupBy === 'group' ? 'status' : groupBy
+    );
+
+  const { data: groups = [] } = useGetGroupsByBoardQuery(
+    groupBy === 'group' ? boardId : ''
   );
-  const { data: groupedTasksData, isLoading: isTasksLoading } =
-    useGetGroupedTasksByBoardQuery(params.boardId as string, groupBy);
 
   const updateTaskStatus = useUpdateTaskStatus();
   const updateTaskPriority = useUpdateTaskPriority();
   const moveTaskPosition = useMoveTaskPosition();
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 8 },
-    })
-  );
-
-  const board = boardData;
-
-  const getColumnValues = useCallback(() => {
-    if (!groupedTasksData || typeof groupedTasksData !== 'object') return [];
-    return Object.keys(groupedTasksData);
+  const flatTasks: Task[] = useMemo(() => {
+    const data = groupedTasksData ?? {};
+    return Object.values(data).flat() as Task[];
   }, [groupedTasksData]);
 
-  const getTasksByColumn = useCallback(
-    (columnValue: string) => {
-      if (!groupedTasksData || typeof groupedTasksData !== 'object') return [];
-      const tasks = groupedTasksData[columnValue];
-      return Array.isArray(tasks) ? tasks : [];
-    },
-    [groupedTasksData]
-  );
+  const {
+    sensors,
+    draggedTask,
+    overId,
+    handleDragStart,
+    handleDragOver,
+    handleDragEnd,
+    getColumnValues,
+    getTasksByColumn,
+    getColumnLabel,
+  } = useKanbanDnD({
+    boardId,
+    groupBy,
+    groupedTasksData: groupedTasksData ?? {},
+    groups,
+    flatTasks,
+    updateTaskStatus,
+    updateTaskPriority,
+    moveTaskPosition,
+  });
 
-  const getAllTasks = useCallback(() => {
-    if (!groupedTasksData || typeof groupedTasksData !== 'object') return [];
-    const allTasks: Task[] = [];
-    Object.values(groupedTasksData).forEach((tasks) => {
-      if (Array.isArray(tasks)) allTasks.push(...tasks);
-    });
-    return allTasks;
-  }, [groupedTasksData]);
+  const columnValues = useMemo(() => getColumnValues(), [getColumnValues]);
 
-  const handleCreateTask = (columnValue: string) => {
-    setSelectedGroupId(columnValue);
-    setIsCreateTaskModalOpen(true);
-  };
-
-  const handleDragStart = useCallback(
-    (event: DragStartEvent) => {
-      const { active } = event;
-      setActiveId(active.id as string);
-      const allTasks = getAllTasks();
-      const draggedTask = allTasks.find((task) => task.id === active.id);
-      setDraggedTaskData(draggedTask || null);
-    },
-    [getAllTasks]
-  );
-
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      const { active, over } = event;
-      setActiveId(null);
-      setDraggedTaskData(null);
-
-      if (!over || !active) return;
-
-      const allTasks = getAllTasks();
-      const activeTaskId = active.id as string;
-      const activeTask = allTasks.find((task) => task.id === activeTaskId);
-      if (!activeTask) return;
-
-      if (over.id.toString().startsWith('column-')) {
-        const newColumnValue = over.id.toString().replace('column-', '');
-        const currentColumnValue =
-          groupBy === 'status' ? activeTask.status : activeTask.priority;
-
-        if (newColumnValue !== currentColumnValue) {
-          if (groupBy === 'status') {
-            updateTaskStatus.mutate({
-              taskId: activeTaskId,
-              status: newColumnValue,
-              boardId: params.boardId as string,
-            });
-          } else {
-            updateTaskPriority.mutate({
-              taskId: activeTaskId,
-              priority: newColumnValue,
-              boardId: params.boardId as string,
-            });
-          }
-        }
-        return;
-      }
-
-      const overTaskId = over.id as string;
-      const overTask = allTasks.find((task) => task.id === overTaskId);
-      if (!overTask || activeTask.id === overTask.id) return;
-
-      const activeColumnValue =
-        groupBy === 'status' ? activeTask.status : activeTask.priority;
-      const overColumnValue =
-        groupBy === 'status' ? overTask.status : overTask.priority;
-
-      if (activeColumnValue !== overColumnValue) {
-        if (groupBy === 'status') {
-          updateTaskStatus.mutate({
-            taskId: activeTaskId,
-            status: overColumnValue,
-            boardId: params.boardId as string,
-          });
-        } else {
-          updateTaskPriority.mutate({
-            taskId: activeTaskId,
-            priority: overColumnValue,
-            boardId: params.boardId as string,
-          });
-        }
-        return;
-      }
-
-      const columnTasks = getTasksByColumn(activeColumnValue);
-      const sortedColumnTasks = [...columnTasks].sort((a, b) => {
-        if (a.position !== b.position) return a.position - b.position;
-        return (
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
-      });
-
-      const activeIndex = sortedColumnTasks.findIndex(
-        (task) => task.id === activeTask.id
-      );
-      const overIndex = sortedColumnTasks.findIndex(
-        (task) => task.id === overTask.id
-      );
-
-      if (activeIndex === -1 || overIndex === -1 || activeIndex === overIndex)
-        return;
-
-      let newPosition: number;
-      if (activeIndex < overIndex) {
-        if (overIndex === sortedColumnTasks.length - 1) {
-          newPosition = sortedColumnTasks[overIndex].position + 1;
-        } else {
-          const nextTask = sortedColumnTasks[overIndex + 1];
-          newPosition =
-            (sortedColumnTasks[overIndex].position + nextTask.position) / 2;
-        }
+  const handleCreateTask = useCallback(
+    (columnKey: string) => {
+      if (groupBy === 'group') {
+        const groupId = columnKey.replace('group-', '');
+        setSelectedGroupId(groupId);
       } else {
-        if (overIndex === 0) {
-          newPosition = Math.max(0, sortedColumnTasks[0].position - 1);
-        } else {
-          const prevTask = sortedColumnTasks[overIndex - 1];
-          newPosition =
-            (prevTask.position + sortedColumnTasks[overIndex].position) / 2;
-        }
+        setSelectedGroupId(columnKey);
       }
-
-      moveTaskPosition.mutate({
-        taskId: activeTaskId,
-        newPosition,
-        boardId: params.boardId as string,
-      });
+      setIsCreateTaskModalOpen(true);
     },
-    [
-      getAllTasks,
-      getTasksByColumn,
-      groupBy,
-      moveTaskPosition,
-      updateTaskStatus,
-      updateTaskPriority,
-      params.boardId,
-    ]
+    [groupBy]
   );
 
-  const handleDragOver = useCallback((event: any) => {
-    const newId = event.over?.id ? String(event.over.id) : null;
-    if (overIdRef.current !== newId) {
-      overIdRef.current = newId;
-      setOverId(newId);
-    }
-  }, []);
-
-  const columnValues = getColumnValues();
-
-  if (isBoardLoading || isTasksLoading) {
+  if (isBoardLoading || isTasksLoadingGrouped) {
     return (
       <div className="h-full flex items-center justify-center">
         <Loader />
@@ -269,7 +112,7 @@ export default function BoardDetailPage() {
     );
   }
 
-  if (!boardData) {
+  if (!board) {
     return (
       <div className="h-full flex items-center justify-center">
         <p className="text-muted-foreground">Board not found</p>
@@ -279,7 +122,6 @@ export default function BoardDetailPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] w-full overflow-x-clip overflow-y-hidden">
-      {/* Header */}
       <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex-shrink-0">
         <div className="flex items-center justify-between p-6">
           <div className="flex items-center space-x-4">
@@ -315,22 +157,21 @@ export default function BoardDetailPage() {
         </div>
       </div>
 
-      {/* Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Group By */}
         <div className="border-b p-4 bg-background/95 backdrop-blur flex-shrink-0">
           <div className="flex items-center space-x-4">
             <span className="text-sm font-medium">Group by:</span>
             <Select
               value={groupBy}
-              onValueChange={(value: 'status' | 'priority') => setGroupBy(value)}
+              onValueChange={(v: GroupBy) => setGroupBy(v)}
             >
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-44">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="status">Status</SelectItem>
                 <SelectItem value="priority">Priority</SelectItem>
+                <SelectItem value="group">Groups (custom)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -340,24 +181,21 @@ export default function BoardDetailPage() {
           <DndContext
             sensors={sensors}
             onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
             onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
           >
             <div className="w-full h-full overflow-x-auto overflow-y-hidden overscroll-x-contain">
               <div className="flex min-w-max gap-6 p-6">
-                {columnValues.map((columnValue) => {
-                  const columnTasks = getTasksByColumn(columnValue);
+                {columnValues.map((columnKey) => {
+                  const columnTasks = getTasksByColumn(columnKey);
                   return (
-                    <DroppableColumn
-                      key={columnValue}
-                      columnValue={columnValue}
-                    >
+                    <DroppableColumn key={columnKey} columnValue={columnKey}>
                       <div className="flex-shrink-0 w-80 h-full">
                         <Card className="h-full flex flex-col">
                           <CardHeader className="pb-3 flex-shrink-0">
                             <div className="flex items-center justify-between">
                               <CardTitle className="text-sm font-semibold capitalize">
-                                {columnValue.replace('_', ' ')}
+                                {getColumnLabel(columnKey)}
                               </CardTitle>
                               <div className="flex items-center space-x-2">
                                 <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
@@ -366,28 +204,27 @@ export default function BoardDetailPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => handleCreateTask(columnValue)}
+                                  onClick={() => handleCreateTask(columnKey)}
                                 >
                                   <Plus className="w-4 h-4" />
                                 </Button>
                               </div>
                             </div>
                           </CardHeader>
-                          <CardContent className="flex-1 overflow-y-auto">
-                            <SortableContext
-                              items={columnTasks.map((task) => task.id)}
-                              strategy={verticalListSortingStrategy}
-                            >
-                              <div className="space-y-2 relative">
+
+                          <CardContent className="px-2 pb-3 flex-1 relative">
+                            <div className="max-h-[calc(100vh-320px)] overflow-y-auto pr-1 pb-8 custom-scrollbar scroll-smooth">
+                              <div className="space-y-2 relative min-h-[60px]">
                                 {columnTasks.map((task) => (
                                   <KanbanTask
                                     key={task.id}
                                     task={task}
-                                    isDragged={activeId === task.id}
+                                    isDragged={draggedTask?.id === task.id}
                                   />
                                 ))}
-                                {activeId &&
-                                  overId === `column-${columnValue}` && (
+
+                                {draggedTask &&
+                                  overId === `column-${columnKey}` && (
                                     <motion.div
                                       layout
                                       initial={{ opacity: 0, scale: 0.95 }}
@@ -400,7 +237,9 @@ export default function BoardDetailPage() {
                                     </motion.div>
                                   )}
                               </div>
-                            </SortableContext>
+                            </div>
+
+                            <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-background to-transparent" />
                           </CardContent>
                         </Card>
                       </div>
@@ -411,7 +250,7 @@ export default function BoardDetailPage() {
             </div>
 
             <DragOverlay>
-              {activeId && draggedTaskData && (
+              {draggedTask && (
                 <motion.div
                   layout
                   initial={{ scale: 0.95, rotate: 0 }}
@@ -419,7 +258,7 @@ export default function BoardDetailPage() {
                   exit={{ scale: 1, rotate: 0 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                 >
-                  <KanbanTask task={draggedTaskData} isDragged />
+                  <KanbanTask task={draggedTask} isDragged />
                 </motion.div>
               )}
             </DragOverlay>
@@ -427,15 +266,14 @@ export default function BoardDetailPage() {
         </div>
       </div>
 
-      {/* Modals */}
       <CreateGroupModal
-        boardId={params.boardId as string}
+        boardId={boardId}
         isOpen={isCreateGroupModalOpen}
         setOpen={setIsCreateGroupModalOpen}
       />
       <CreateTaskModal
         groupId={selectedGroupId || ''}
-        boardId={params.boardId as string}
+        boardId={boardId}
         isOpen={isCreateTaskModalOpen}
         setOpen={setIsCreateTaskModalOpen}
       />

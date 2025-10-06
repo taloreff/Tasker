@@ -36,7 +36,6 @@ export default function WorkspaceTeamsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Teams</h1>
@@ -50,7 +49,6 @@ export default function WorkspaceTeamsPage() {
         </Button>
       </div>
 
-      {/* Teams List */}
       <TeamList
         workspaceId={workspaceId}
         teams={teams}

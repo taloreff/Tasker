@@ -49,7 +49,6 @@ export default function WorkspaceSettingsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">Settings</h1>
         <p className="text-muted-foreground mt-1">
@@ -58,9 +57,7 @@ export default function WorkspaceSettingsPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        {/* Main Settings */}
         <div className="md:col-span-2 space-y-6">
-          {/* General Settings */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -118,7 +115,6 @@ export default function WorkspaceSettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Members */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -179,9 +175,7 @@ export default function WorkspaceSettingsPage() {
           </Card>
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6">
-          {/* Danger Zone */}
           <Card className="border-red-200">
             <CardHeader>
               <CardTitle className="text-red-600">Danger Zone</CardTitle>
@@ -204,7 +198,6 @@ export default function WorkspaceSettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Quick Stats */}
           <Card>
             <CardHeader>
               <CardTitle>Workspace Stats</CardTitle>

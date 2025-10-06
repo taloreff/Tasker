@@ -43,7 +43,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
-      {/* Navigation */}
       <nav className="relative z-50 px-6 py-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -68,7 +67,6 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
       <main className="relative">
         <div className="max-w-7xl mx-auto px-6 pt-20 pb-32">
           <div className="text-center">
@@ -96,13 +94,11 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Product Preview */}
           <div className="relative mt-20">
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10"></div>
             <div className="bg-gray-900 rounded-lg border border-gray-800 p-1">
               <div className="bg-black rounded-lg p-6">
                 <div className="grid grid-cols-12 gap-4 h-96">
-                  {/* Sidebar Preview */}
                   <div className="col-span-3 bg-gray-900 rounded p-4 space-y-3">
                     <div className="flex items-center space-x-2 mb-6">
                       <CheckCircle className="w-5 h-5" />
@@ -124,7 +120,6 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  {/* Main Content Preview */}
                   <div className="col-span-9 bg-gray-800 rounded p-4">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
@@ -151,7 +146,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Features Section */}
         <section id="features" className="py-32 border-t border-gray-800">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-20">
@@ -201,7 +195,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* CTA Section */}
         <section className="py-32 border-t border-gray-800">
           <div className="max-w-4xl mx-auto text-center px-6">
             <h2 className="text-4xl md:text-5xl font-medium mb-8">
@@ -223,7 +216,6 @@ export default function HomePage() {
         </section>
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-gray-800 py-12">
         <div className="max-w-7xl mx-auto px-6 text-center text-gray-400">
           <p>&copy; 2024 Tasker. Built for modern teams.</p>

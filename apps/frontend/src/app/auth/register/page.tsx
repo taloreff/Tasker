@@ -74,7 +74,6 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-tr from-emerald-900 via-teal-900 to-cyan-900">
-      {/* Animated Background Effects with Different Colors */}
       <div className="absolute inset-0 w-full h-full">
         <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-emerald-500 rounded-full mix-blend-multiply filter blur-xl opacity-25 animate-pulse"></div>
         <div className="absolute bottom-1/3 left-1/4 w-80 h-80 bg-teal-500 rounded-full mix-blend-multiply filter blur-xl opacity-25 animate-pulse animation-delay-2000"></div>

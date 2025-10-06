@@ -16,7 +16,6 @@ import {
 export default function MyItemsPage() {
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">My Items</h1>
@@ -30,7 +29,6 @@ export default function MyItemsPage() {
         </Button>
       </div>
 
-      {/* Coming Soon Content */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -55,7 +53,6 @@ export default function MyItemsPage() {
         </CardContent>
       </Card>
 
-      {/* Quick Stats Preview */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

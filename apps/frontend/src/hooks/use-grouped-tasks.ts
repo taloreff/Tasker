@@ -7,7 +7,7 @@ type GroupedTasks = Record<string, Task[]>;
 
 export const useGetGroupedTasksByBoardQuery = (boardId: string, groupBy: 'status' | 'priority' = 'status') => {
   return useQuery({
-    queryKey: [REACT_QUERY_KEYS.TASKS, 'grouped', boardId, groupBy],
+    queryKey: [REACT_QUERY_KEYS.TASKS, 'grouped', boardId],
     queryFn: async (): Promise<GroupedTasks> => {
       return apiClient.get<GroupedTasks>(`/tasks?boardId=${boardId}&groupBy=${groupBy}`);
     },

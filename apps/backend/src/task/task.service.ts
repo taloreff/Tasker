@@ -14,6 +14,7 @@ import { AssignTaskDto } from './dtos/assign-task.dto';
 import { BoardService } from '../board/board.service';
 import { UserService } from '../user/user.service';
 import { WorkspaceService } from '../workspace/workspace.service';
+import { Group, GroupType } from '../group/entities/group.entity';
 
 @Injectable()
 export class TaskService {
@@ -22,6 +23,8 @@ export class TaskService {
   constructor(
     @InjectRepository(Task)
     private readonly taskRepo: Repository<Task>,
+    @InjectRepository(Group)
+    private readonly groupRepo: Repository<Group>,
     private readonly boardService: BoardService,
     private readonly userService: UserService,
     private readonly workspaceService: WorkspaceService
@@ -76,26 +79,28 @@ export class TaskService {
   ) {
     const tasks = await this.findAllByBoard(boardId, userId);
 
-    const grouped: Record<string, Task[]> = {};
-    const order =
-      groupBy === 'status'
-        ? [
-            TaskStatus.TODO,
-            TaskStatus.IN_PROGRESS,
-            TaskStatus.REVIEW,
-            TaskStatus.DONE,
-            TaskStatus.BLOCKED,
-            TaskStatus.CANCELLED
-          ]
-        : [
-            TaskPriority.LOW,
-            TaskPriority.MEDIUM,
-            TaskPriority.HIGH,
-            TaskPriority.URGENT
-          ];
+    const groups = await this.groupRepo.find({
+      where: {
+        boardId,
+        groupType: groupBy as GroupType
+      },
+      order: { position: 'ASC' }
+    });
 
-    order.forEach(key => (grouped[key] = []));
-    tasks.forEach(t => grouped[t[groupBy]].push(t));
+    const grouped: Record<string, Task[]> = {};
+    for (const group of groups) {
+      grouped[group.name] = [];
+    }
+
+    for (const task of tasks) {
+      const groupKey = task[groupBy];
+      if (grouped[groupKey]) {
+        grouped[groupKey].push(task);
+      } else {
+        if (!grouped['unassigned']) grouped['unassigned'] = [];
+        grouped['unassigned'].push(task);
+      }
+    }
 
     return grouped;
   }
@@ -137,9 +142,6 @@ export class TaskService {
 
   async moveTask(id: string, dto: MoveTaskDto, userId: string): Promise<Task> {
     const task = await this.findOne(id, userId);
-    console.log('🟢 Found task:', task.id);
-
-    const newGroupId = dto.groupId || task.groupId;
 
     if (dto.position === undefined) {
       const { max } = await this.taskRepo
@@ -150,25 +152,29 @@ export class TaskService {
       dto.position = (max || 0) + 1;
     }
 
-    console.log('🟢 Updating position to', dto.position);
+    if (dto.groupId) {
+      const group = await this.groupRepo.findOne({
+        where: { id: dto.groupId }
+      });
+      if (!group) throw new BadRequestException('Target group not found');
 
-    Object.assign(task, {
-      position: dto.position,
-      groupId: newGroupId
-    });
+      task.groupId = group.id;
 
-    console.log("saved task:", task) 
+      if (group.groupType === GroupType.STATUS) {
+        if (Object.values(TaskStatus).includes(group.name as TaskStatus)) {
+          task.status = group.name as TaskStatus;
+        }
+      }
+      if (group.groupType === GroupType.PRIORITY) {
+        if (Object.values(TaskPriority).includes(group.name as TaskPriority)) {
+          task.priority = group.name as TaskPriority;
+        }
+      }
+    }
 
-    await this.taskRepo.update(task.id, {
-      position: dto.position,
-      groupId: newGroupId
-    });
-
-    console.log('🟢 Task saved, re-fetching...');
-
-    const updated = await this.findOne(id, userId);
-    console.log('✅ Move complete');
-    return updated;
+    task.position = dto.position;
+    await this.taskRepo.save(task);
+    return this.findOne(id, userId);
   }
 
   async assignTask(
