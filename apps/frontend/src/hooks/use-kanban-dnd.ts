@@ -9,6 +9,7 @@ import {
   DragEndEvent,
 } from '@dnd-kit/core';
 import { Task, Group, TaskPriority, TaskStatus } from '@/types';
+import { GroupedTasksResponse } from './use-grouped-tasks';
 
 export type GroupBy = 'status' | 'priority' | 'group';
 
@@ -40,7 +41,7 @@ type MoveTaskPositionMut = {
 interface UseKanbanDnDArgs {
   boardId: string;
   groupBy: GroupBy;
-  groupedTasksData: Record<string, Task[]>;
+  groupedTasksData: GroupedTasksResponse;
   groups?: Group[];
   flatTasks: Task[];
   updateTaskStatus: UpdateTaskStatusMut;
@@ -79,7 +80,7 @@ export function useKanbanDnD({
   const getTasksByColumn = useCallback(
     (columnKey: string) => {
       if (groupBy !== 'group') {
-        return groupedTasksData[columnKey] ?? [];
+        return groupedTasksData[columnKey]?.tasks ?? [];
       }
       const isGroupKey = columnKey.startsWith('group-');
       if (!isGroupKey) return [];
@@ -94,8 +95,8 @@ export function useKanbanDnD({
       return flatTasks;
     }
     const all: Task[] = [];
-    Object.values(groupedTasksData).forEach(
-      (arr) => Array.isArray(arr) && all.push(...arr)
+    Object.values(groupedTasksData).forEach((group) =>
+      all.push(...(group?.tasks ?? []))
     );
     return all;
   }, [groupBy, groupedTasksData, flatTasks]);

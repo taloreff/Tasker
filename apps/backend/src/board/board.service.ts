@@ -36,11 +36,11 @@ export class BoardService {
     });
 
     const savedBoard = await this.boardRepo.save(board);
-    const defaultGroups: DeepPartial<Group>[] = [
+    const defaultStatusGroups: DeepPartial<Group>[] = [
       {
         name: 'todo',
         groupType: GroupType.STATUS,
-        color: '#E5E7EB',
+        color: '#E0D9D9',
         boardId: savedBoard.id
       },
       {
@@ -75,7 +75,36 @@ export class BoardService {
       }
     ];
 
-    await this.groupRepo.save(defaultGroups);
+    const defaultPriorityGroups: DeepPartial<Group>[] = [
+       {
+        name: 'low',
+        groupType: GroupType.PRIORITY,
+        // blue color
+        color: '#0097d7',
+        boardId: savedBoard.id
+      },
+      {
+        name: 'medium',
+        groupType: GroupType.PRIORITY,
+        color: '#F59E0B',
+        boardId: savedBoard.id
+      },
+      {
+        name: 'high',
+        groupType: GroupType.PRIORITY,
+        color: '#EF5656',
+        boardId: savedBoard.id
+      },
+      {
+        name: 'urgent',
+        groupType: GroupType.PRIORITY,
+        color: '#8B0000',
+        boardId: savedBoard.id
+      }
+    ];
+
+    await this.groupRepo.save(defaultStatusGroups);
+    await this.groupRepo.save(defaultPriorityGroups);
 
     this.logger.log(`Board created with default groups: ${savedBoard.id}`);
 

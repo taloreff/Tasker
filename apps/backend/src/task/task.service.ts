@@ -87,22 +87,25 @@ export class TaskService {
       order: { position: 'ASC' }
     });
 
-    const grouped: Record<string, Task[]> = {};
+    const groupMap = new Map<string, { color: string | null; tasks: Task[] }>();
+
     for (const group of groups) {
-      grouped[group.name] = [];
+      groupMap.set(group.name, { color: group.color ?? null, tasks: [] });
     }
 
     for (const task of tasks) {
       const groupKey = task[groupBy];
-      if (grouped[groupKey]) {
-        grouped[groupKey].push(task);
+      if (groupMap.has(groupKey)) {
+        groupMap.get(groupKey)!.tasks.push(task);
       } else {
-        if (!grouped['unassigned']) grouped['unassigned'] = [];
-        grouped['unassigned'].push(task);
+        if (!groupMap.has('unassigned')) {
+          groupMap.set('unassigned', { color: null, tasks: [] });
+        }
+        groupMap.get('unassigned')!.tasks.push(task);
       }
     }
 
-    return grouped;
+    return Object.fromEntries(groupMap);
   }
 
   async findUserTasks(userId: string): Promise<Task[]> {

@@ -21,7 +21,7 @@ export function KanbanColumn({
   columnKey,
   tasks,
   onCreateTask,
-  color = '#E5E7EB',
+  color = '#E0D9D9',
 }: KanbanColumnProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
